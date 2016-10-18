@@ -1,72 +1,67 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
+<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:id="@+id/slidingUpPanelLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="andy.firebasedemo.MapsActivity">
+    android:gravity="bottom"
+    app:umanoFadeColor="@android:color/transparent"
+    app:umanoOverlay="true"
+    app:umanoPanelHeight="40dp"
+    app:umanoScrollableView="@+id/recyclerView"
+    app:umanoShadowHeight="4dp"
+    android:background="@android:color/transparent"
+    >
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="andy.firebasedemo.MapsActivity" />
+        android:layout_height="match_parent">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="andy.firebasedemo.MapsActivity" />
+
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="10dp"
-        >
+        android:layout_height="wrap_content"
+        android:background="#97635c56">
 
         <EditText
             android:id="@+id/editText"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/send"
+            android:layout_toStartOf="@+id/send"
             android:ems="10"
             android:hint="@string/please_input_message"
             android:inputType="textPersonName"
             android:text=""
-            android:textSize="18sp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/button2"
-            android:layout_toStartOf="@+id/button2" />
+            android:textSize="18sp" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/send"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:text="@string/send"
-            android:layout_alignParentBottom="true"
+            android:layout_alignBaseline="@+id/editText"
+            android:layout_alignBottom="@+id/editText"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:text="@string/send" />
 
-        <Button
-            android:text="@string/login_out"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:id="@+id/loginOut" />
-
-        <ListView
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:id="@+id/historyListView"
-            android:layout_above="@+id/button2"
-            android:visibility="gone"
-            android:layout_below="@+id/historyButton" />
+            android:layout_below="@+id/send" />
 
-        <Button
-            android:text="history"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/historyButton"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/loginOut"
-            android:layout_toEndOf="@+id/loginOut" />
     </RelativeLayout>
-</FrameLayout>
+
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>
