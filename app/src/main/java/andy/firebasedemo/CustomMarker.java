@@ -13,8 +13,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class CustomMarker {
     public static MarkerOptions createMarker(Context context){
         MarkerOptions mMarkerOption = new MarkerOptions();
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.mipmap.messageing);
-        mMarkerOption.icon(icon);
         return mMarkerOption;
     }
 }

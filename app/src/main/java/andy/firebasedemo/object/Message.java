@@ -1,4 +1,4 @@
-package andy.firebasedemo;
+package andy.firebasedemo.object;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
@@ -14,16 +14,17 @@ public class Message {
     public String name;
     public String uid;
     public String msg;
-
+    public long time;
 
     public Message() {
 
     }
 
-    public Message(String uid, String name, String msg) {
+    public Message(String uid, String name, String msg, long time) {
         this.uid = uid;
         this.name = name;
         this.msg = msg;
+        this.time = time;
     }
 
     @Exclude
@@ -32,7 +33,7 @@ public class Message {
         result.put("uid", uid);
         result.put("name", name);
         result.put("msg", msg);
-
+        result.put("time", time);
         return result;
     }
 
