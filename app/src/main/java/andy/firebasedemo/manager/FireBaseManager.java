@@ -1,11 +1,14 @@
 package andy.firebasedemo.manager;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -15,6 +18,10 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.HashMap;
 
 import andy.firebasedemo.object.Member;
@@ -53,8 +60,10 @@ public class FireBaseManager {
     public void login(LatLng latLng, OnCompleteListener onCompleteListener) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
+            Log.d(TAG, user.getProviderId());
             myMember = new Member(user.getDisplayName(), user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "", latLng.latitude, latLng.longitude, System.currentTimeMillis(), FirebaseInstanceId.getInstance().getToken());
             mOnLineDataBase.child(user.getUid()).setValue(myMember).addOnCompleteListener(onCompleteListener);
+            requestFBUserId();
         }
     }
 
@@ -66,7 +75,37 @@ public class FireBaseManager {
         }
     }
 
+    public void requestFBUserId(){
 
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                    user.getToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                        @Override
+                        public void onComplete(@NonNull final Task<GetTokenResult> task) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    OkHttpClient client = new OkHttpClient();
+                                    Request request = new Request.Builder()
+                                            .url("https://graph.facebook.com/me?fields=id&access_token="+task.getResult().getToken().trim())
+                                            .build();
+
+                                    try {
+                                        Response response = client.newCall(request).execute();
+                                        JSONObject json = new JSONObject(response.body().string());
+                                        Log.d(TAG, json.toString());
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).start();
+
+                        }
+                    });
+                }
+    }
 
     public void sendMessage(Message item, OnCompleteListener<Void> listener) {
         mMessagesDataBase.push().setValue(item).addOnCompleteListener(listener);
@@ -81,7 +120,6 @@ public class FireBaseManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                HashMap<String, String> item = new HashMap<>();
                 try {
                     String jsonMessage = "{\"notification\":{\n" +
                             "\"title\":\""+sender+"\"," +

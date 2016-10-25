@@ -19,13 +19,15 @@
             android:theme="?attr/actionBarTheme"
             app:navigationIcon="@android:drawable/ic_menu_agenda"
             app:theme="@style/Theme.AppCompat"
-            app:title="@string/app_name" />
+            app:title="@string/app_name"
+            />
 
         <android.support.v4.widget.DrawerLayout
             android:id="@+id/drawerLayout2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/toolbar"
+
             >
 
             <RelativeLayout
@@ -77,10 +79,10 @@
 
             <RelativeLayout
                 android:id="@+id/menu2"
-                android:layout_width="300dp"
+                android:layout_width="200dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="left"
-                android:background="@color/colorPrimaryDark">
+                android:background="#afbebebe">
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/recyclerView"

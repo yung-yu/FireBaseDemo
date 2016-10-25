@@ -2,6 +2,7 @@ package andy.firebasedemo;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,7 +17,10 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -30,6 +34,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -44,8 +50,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
+import andy.firebasedemo.component.HeadShotMarker;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.adapter.MessageAdapter;
 import andy.firebasedemo.object.Member;
@@ -61,8 +69,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mGoogleMap;
     private EditText messageEditText;
     private Button send;
-    private HashMap<String, Marker> mapMarkerCache = new HashMap<>();
     private HashMap<String, Member> memberCache = new HashMap<>();
+    private HashMap<String, Bitmap> bigHeadCache = new HashMap<>();
     private DatabaseReference mMessagesDatabase;
     private FirebaseAuth mAuth;
     private DatabaseReference mMemberDataBase;
@@ -93,6 +101,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         chat = (FloatingActionButton) findViewById(R.id.chat);
         menu2 = (RelativeLayout) findViewById(R.id.menu2);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.inflateMenu(R.menu.toolbar_menu);
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.loginOut:
+                        FireBaseManager.getInstance().loginOut();
+                        mAuth.signOut();
+                        startActivity(new Intent(MapsActivity.this, LoginActivity.class));
+                        finish();
+                        break;
+
+                }
+                return false;
+            }
+        });
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
@@ -170,7 +194,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mGoogleMap.clear();
         }
         memberCache.clear();
-        mapMarkerCache.clear();
         mMessageAdapter.stopLisetener();
     }
 
@@ -212,13 +235,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
         }
-        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-
-                return false;
-            }
-        });
         // Begin polling for new location updates.
         startLocationUpdates();
     }
@@ -234,19 +250,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         mGoogleMap = googleMap;
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
         googleMap.getUiSettings().setRotateGesturesEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
-        googleMap.setMyLocationEnabled(true);
-        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public void onInfoWindowClick(Marker marker) {
-                String uid = (String) marker.getTag();
-                if(!TextUtils.isEmpty(uid)){
-                    showP2pMsg(uid);
-                }
+            public boolean onMarkerClick(final Marker marker) {
+                showP2pMsg((String) marker.getTag());
+                return false;
             }
         });
 
@@ -281,10 +294,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Member member = data.getValue(Member.class);
                         memberCache.put(data.getKey(), member);
                         if (member.lat != 0 && member.lot != 0) {
-                            addMarker(dataSnapshot.getKey(), new LatLng(member.lat, member.lot));
+                            member.setMarker(addMarker(data.getKey(), new LatLng(member.lat, member.lot)));
+                            if(!TextUtils.isEmpty(member.icon)){
+                                new BigHeaderTask(member.getMarker()).execute(member.icon);
+                            }
                         }
+
                     }
                 }
+                mMessagesDatabase = FirebaseDatabase.getInstance().getReference("messages");
+                mMessagesDatabase.orderByKey().limitToLast(1).addChildEventListener(messagesListener);
+                mMessageAdapter.startLisetener();
+                mMemberDataBase.addChildEventListener(memberListener);
             }
 
             @Override
@@ -292,10 +313,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-        mMemberDataBase.addChildEventListener(memberListener);
-        mMessagesDatabase = FirebaseDatabase.getInstance().getReference("messages");
-        mMessagesDatabase.orderByKey().limitToLast(1).addChildEventListener(messagesListener);
-        mMessageAdapter.startLisetener();
+
     }
 
     private ChildEventListener memberListener = new ChildEventListener() {
@@ -303,27 +321,57 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             Log.d(TAG + "member", "onChildAdded");
             Member member = dataSnapshot.getValue(Member.class);
-            memberCache.put(dataSnapshot.getKey(), member);
-            if (member.lat != 0 && member.lot != 0) {
-                addMarker(dataSnapshot.getKey(), new LatLng(member.lat, member.lot));
+            Member oldMember = memberCache.get(dataSnapshot.getKey());
+            if(oldMember != null ){
+                member.setMarker(oldMember.getMarker());
+                if (oldMember.getMarker() != null && member.lat != 0 && member.lot != 0) {
+                    member.getMarker().setPosition(new LatLng(member.lat, member.lot));
+                }else if (member.lat != 0 && member.lot != 0) {
+                    member.setMarker(addMarker(dataSnapshot.getKey(), new LatLng(member.lat, member.lot)));
+                }
+                if(!oldMember.icon.equals(member.icon)){
+                    new BigHeaderTask(member.getMarker()).execute(member.icon);
+                }
+            }else if (member.lat != 0 && member.lot != 0) {
+                member.setMarker(addMarker(dataSnapshot.getKey(), new LatLng(member.lat, member.lot)));
+                if(!oldMember.icon.equals(member.icon)){
+                    new BigHeaderTask(member.getMarker()).execute(member.icon);
+                }
             }
+            memberCache.put(dataSnapshot.getKey(), member);
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             Log.d(TAG + "member", "onChildChanged");
             Member member = dataSnapshot.getValue(Member.class);
-            memberCache.put(dataSnapshot.getKey(), member);
-            if (member.lat != 0 && member.lot != 0) {
-                updateMarkerPosition(dataSnapshot.getKey(), new LatLng(member.lat, member.lot));
+            Member oldMember = memberCache.get(dataSnapshot.getKey());
+            if(oldMember != null ){
+                member.setMarker(oldMember.getMarker());
+                if (oldMember.getMarker() != null && member.lat != 0 && member.lot != 0) {
+                    member.getMarker().setPosition(new LatLng(member.lat, member.lot));
+                }else if (member.lat != 0 && member.lot != 0) {
+                    member.setMarker(addMarker(dataSnapshot.getKey(), new LatLng(member.lat, member.lot)));
+                }
+                if(!oldMember.icon.equals(member.icon)){
+                    new BigHeaderTask(member.getMarker()).execute(member.icon);
+                }
+            }else if (member.lat != 0 && member.lot != 0) {
+                member.setMarker(addMarker(dataSnapshot.getKey(), new LatLng(member.lat, member.lot)));
+                if(!oldMember.icon.equals(member.icon)){
+                    new BigHeaderTask(member.getMarker()).execute(member.icon);
+                }
             }
+            memberCache.put(dataSnapshot.getKey(), member);
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             Log.d(TAG + "member", "onChildRemoved");
             Log.d(TAG, dataSnapshot.toString());
-            removeMarker(dataSnapshot.getKey());
+            Member member = memberCache.get(dataSnapshot.getKey());
+            member.getMarker().remove();
+            memberCache.remove(dataSnapshot.getKey());
         }
 
         @Override
@@ -341,11 +389,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             Log.d(TAG + "messages", "onChildAdded");
-            final Message message = dataSnapshot.getValue(Message.class);
+            Message message = dataSnapshot.getValue(Message.class);
             Member member = memberCache.get(message.uid);
-            if (member != null && member.lat != 0 && member.lot != 0) {
-                updateMarker(message.uid, message.msg);
+            if(member != null && member.getMarker() != null) {
+                member.getMarker().setTitle(message.msg);
+                member.getMarker().showInfoWindow();
             }
+
 
         }
 
@@ -386,7 +436,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onLocationChanged(final Location location) {
+    public void onLocationChanged(Location location) {
         Member member = memberCache.get(mAuth.getCurrentUser().getUid());
         if (member != null) {
             member.lat = location.getLatitude();
@@ -416,54 +466,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
-    private synchronized void updateMarker(String key, String msg) {
-        Marker marker = null;
-        if (mGoogleMap != null) {
-            if (mapMarkerCache.containsKey(key)) {
-                marker = mapMarkerCache.get(key);
-                marker.setTitle(msg);
-                marker.showInfoWindow();
-            }
 
-        }
-    }
 
-    private synchronized void updateMarkerPosition(String key, LatLng latLng) {
-        Marker marker = null;
-        if (mGoogleMap != null) {
-            if (mapMarkerCache.containsKey(key)) {
-                marker = mapMarkerCache.get(key);
-                marker.setPosition(latLng);
-            }
-
-        }
-    }
-
-    private synchronized void addMarker(String key, LatLng latLng) {
+    private synchronized Marker addMarker(String key, LatLng latLng) {
         Marker marker = null;
         if (mGoogleMap != null && latLng != null) {
-            String curTitle = "";
-            marker = mapMarkerCache.get(key);
-            if (marker != null) {
-                if(!marker.getPosition().equals(latLng)) {
-                    marker.setPosition(latLng);
-                }
-            } else {
-                MarkerOptions options = CustomMarker.createMarker(this);
-                options.position(latLng);
-                marker = mGoogleMap.addMarker(options);
-                marker.setTag(key);
-                mapMarkerCache.put(key, marker);
-            }
+            MarkerOptions options = CustomMarker.createMarker(this);
+            options.position(latLng);
+            options.icon(BitmapDescriptorFactory.fromResource(R.drawable.visitor));
+            marker = mGoogleMap.addMarker(options);
+            marker.setTag(key);
         }
+        return marker;
     }
 
-    private synchronized void removeMarker(String key) {
-        if (mapMarkerCache.containsKey(key)) {
-            Marker marker = mapMarkerCache.get(key);
-            marker.remove();
-        }
-    }
+
 
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override

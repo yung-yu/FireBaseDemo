@@ -6,4 +6,5 @@
     <string name="send">send</string>
     <string name="login_out">login out</string>
     <string name="change_name">change Name</string>
+    <string name="loginout">loginout</string>
 </resources>

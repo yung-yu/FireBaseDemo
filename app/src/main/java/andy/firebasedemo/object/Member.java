@@ -1,5 +1,6 @@
 package andy.firebasedemo.object;
 
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
@@ -17,6 +18,7 @@ public class Member {
     public double lot;
     public long time;
     public String token;
+    private Marker marker;
 
     public Member() {
     }
@@ -29,6 +31,15 @@ public class Member {
         this.time = time;
         this.token = token;
     }
+
+    public Marker getMarker() {
+        return marker;
+    }
+
+    public void setMarker(Marker marker) {
+        this.marker = marker;
+    }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
