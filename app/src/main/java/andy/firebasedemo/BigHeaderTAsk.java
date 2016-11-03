@@ -36,7 +36,7 @@ public class BigHeaderTask extends AsyncTask<String, Void, Bitmap>{
     @Override
     protected Bitmap doInBackground(String... urls) {
 
-         OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
                 .url(urls[0])
