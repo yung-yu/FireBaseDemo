@@ -1,18 +1,11 @@
 package andy.firebasedemo.Log;
 
-import android.os.Environment;
-import android.support.compat.BuildConfig;
+
 import android.util.Log;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
+import andy.firebasedemo.BuildConfig;
 
 /**
  * Created by andyli on 2015/7/15.
@@ -23,7 +16,7 @@ public class L {
     private static final String EXCEPTION_END = "****************EXCEPTION END****************";
     private static String TAG = "customlog";
 
-    private static  boolean IS_DEBUG = true;
+    private final static boolean IS_DEBUG = BuildConfig.DEBUG ;
 
     public static String getProcess(){
         StackTraceElement[] elements =   Thread.currentThread().getStackTrace();
@@ -37,7 +30,6 @@ public class L {
         if(!IS_DEBUG){
             return;
         }
-       StackTraceElement[] elements =   Thread.currentThread().getStackTrace();
         try {
             msg = getProcess()+msg;
             Log.d(tag, msg);

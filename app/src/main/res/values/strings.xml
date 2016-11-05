@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">FireBaseDemo</string>
-    <string name="facebook_app_id" translatable="false">723591907733842</string>
     <string name="title_activity_maps">Map</string>
     <string name="please_input_message">please input message...</string>
     <string name="send">send</string>

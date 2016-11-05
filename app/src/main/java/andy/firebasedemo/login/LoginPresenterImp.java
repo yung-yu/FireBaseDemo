@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
-import android.widget.ProgressBar;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -42,30 +41,26 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 	private final static String TAG = "LoginPresenterImp";
 	private final static String[] FACEBOOK_PERMISSIONS = {"email", "public_profile"};
 	private final static int GOOGLE_AUTH_REQUEST_CODE = 9898;
-	public LoginContract.View view;
+	public LoginContract.View  loginView;
 	public Context context;
 	private CallbackManager mCallbackManager;
 	private Fragment mFragment;
 	private Activity mActivity;
 
 
-	public LoginPresenterImp(Context context, Fragment fragment, LoginContract.View view) {
-		this.view = view;
-		this.context = context;
+	public LoginPresenterImp(Fragment fragment, LoginContract.View loginView) {
+		this.loginView = loginView;
+		this.loginView.setPresenter(this);
+		this.context = fragment.getContext();
+		this.mActivity = fragment.getActivity();
 		this.mFragment = fragment;
 
 
 	}
 
-	public LoginPresenterImp(Activity activity, LoginContract.View view) {
-		this.view = view;
-		this.context = activity;
-		this.mActivity = activity;
-
-	}
-
-	public LoginPresenterImp(FragmentActivity activity, LoginContract.View view) {
-		this.view = view;
+	public LoginPresenterImp(Activity activity, LoginContract.View loginView) {
+		this.loginView = loginView;
+		loginView.setPresenter(this);
 		this.context = activity;
 		this.mActivity = activity;
 
@@ -73,13 +68,13 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	@Override
 	public void doEmailLoginLogin(String email, String password) {
-		view.setProgessBarShow(true);
+		loginView.setProgessBarShow(true);
 		normalLogin(email,password);
 	}
 
 	@Override
 	public void doGoogleLogin() {
-		view.setProgessBarShow(true);
+		loginView.setProgessBarShow(true);
 		GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
 				.requestIdToken(context.getString(R.string.default_web_client_id))
 				.requestEmail()
@@ -95,7 +90,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	@Override
 	public void doFacebookLogin() {
-		view.setProgessBarShow(true);
+		loginView.setProgessBarShow(true);
 		if (mCallbackManager == null) mCallbackManager = CallbackManager.Factory.create();
 		LoginManager.getInstance().registerCallback(mCallbackManager, mFacebookCallback);
 		if (mFragment != null) {
@@ -107,17 +102,17 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	@Override
 	public void doAnonymouslyLogin() {
-		view.setProgessBarShow(true);
+		loginView.setProgessBarShow(true);
 		FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
 				if (task.isSuccessful()) {
-					view.LoginSuccess(LoginType.Anonymously);
+					loginView.LoginSuccess(LoginType.Anonymously);
 				} else {
 					L.e(TAG, task.getException().toString());
-					view.LoginFailed(task.getException().getMessage());
+					loginView.LoginFailed(task.getException().getMessage());
 				}
-				view.setProgessBarShow(false);
+				loginView.setProgessBarShow(false);
 			}
 		});
 	}
@@ -158,15 +153,15 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 		@Override
 		public void onCancel() {
 			L.d(TAG, "facebook:onCancel");
-			view.LoginFailed(context.getString(R.string.loginFailed));
-			view.setProgessBarShow(false);
+			loginView.LoginFailed(context.getString(R.string.loginFailed));
+			loginView.setProgessBarShow(false);
 		}
 
 		@Override
 		public void onError(FacebookException error) {
 			L.d(TAG, "facebook:onError:" + error.getMessage());
-			view.LoginFailed(error.getMessage());
-			view.setProgessBarShow(false);
+			loginView.LoginFailed(error.getMessage());
+			loginView.setProgessBarShow(false);
 		}
 	};
 
@@ -179,12 +174,12 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 					public void onComplete(@NonNull Task<AuthResult> task) {
 						L.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 						if (task.isSuccessful()) {
-							view.LoginSuccess(LoginType.Facebook);
+							loginView.LoginSuccess(LoginType.Facebook);
 						} else {
 							L.e(TAG, "signInWithCredential" + task.getException().getMessage());
-							view.LoginFailed(task.getException().getMessage());
+							loginView.LoginFailed(task.getException().getMessage());
 						}
-						view.setProgessBarShow(false);
+						loginView.setProgessBarShow(false);
 
 					}
 				});
@@ -194,8 +189,8 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 		@Override
 		public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 			L.e(TAG, connectionResult.getErrorCode() + ":" + connectionResult.getErrorMessage());
-			view.LoginFailed(context.getString(R.string.loginFailed));
-			view.setProgessBarShow(false);
+			loginView.LoginFailed(context.getString(R.string.loginFailed));
+			loginView.setProgessBarShow(false);
 		}
 	};
 
@@ -206,28 +201,28 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 					@Override
 					public void onComplete(@NonNull Task<AuthResult> task) {
 						if (task.isSuccessful()) {
-							view.LoginSuccess(LoginType.Google);
+							loginView.LoginSuccess(LoginType.Google);
 						} else {
 							L.e(TAG, task.getException().getMessage());
-							view.LoginFailed(task.getException().getMessage());
+							loginView.LoginFailed(task.getException().getMessage());
 						}
-						view.setProgessBarShow(false);
+						loginView.setProgessBarShow(false);
 					}
 				});
 	}
 
 	private void normalLogin(final String email, final String password) {
 		if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-			view.LoginFailed(context.getString(R.string.plase_input_email_and_password));
-			view.setProgessBarShow(false);
+			loginView.LoginFailed(context.getString(R.string.plase_input_email_and_password));
+			loginView.setProgessBarShow(false);
 			return;
 		}
 		FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
 				if (task.isSuccessful()) {
-					view.LoginSuccess(LoginType.normal);
-					view.setProgessBarShow(false);
+					loginView.LoginSuccess(LoginType.normal);
+					loginView.setProgessBarShow(false);
 				} else {
 					L.e(TAG, task.getException().toString());
 					FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -235,12 +230,12 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 						public void onComplete(@NonNull Task<AuthResult> task) {
 							L.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 							if (task.isSuccessful()) {
-								view.LoginSuccess(LoginType.normal);
+								loginView.LoginSuccess(LoginType.normal);
 							} else{
 								L.e(TAG, task.getException().getMessage());
-								view.LoginFailed(task.getException().getMessage());
+								loginView.LoginFailed(task.getException().getMessage());
 							}
-							view.setProgessBarShow(false);
+							loginView.setProgessBarShow(false);
 						}
 					});
 				}

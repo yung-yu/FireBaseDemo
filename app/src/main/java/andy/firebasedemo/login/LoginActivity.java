@@ -9,14 +9,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.facebook.FacebookSdk;
 
 import andy.firebasedemo.R;
-import andy.firebasedemo.login.LoginContract;
-import andy.firebasedemo.login.LoginPresenterImp;
-import andy.firebasedemo.login.LoginType;
 
 /**
  * Created by andyli on 2016/10/8.
@@ -36,7 +32,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.loginactivity);
+        setContentView(R.layout.activity_login);
         emailEditText = (EditText) findViewById(R.id.email);
         passwordEditText = (EditText) findViewById(R.id.password);
         loginButton = (Button) findViewById(R.id.loginButton);
@@ -108,5 +104,8 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
        }
     }
 
+    @Override
+    public void setPresenter(LoginContract.Presenter Presenter) {
 
+    }
 }

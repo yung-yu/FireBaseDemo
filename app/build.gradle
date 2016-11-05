@@ -14,6 +14,10 @@ android {
 
     }
     buildTypes {
+        debug {
+            resValue("string", "google_maps_key", "AIzaSyAEe-vUvSeCW12cCvYu-B5HO7hhiH_aooY");
+            resValue("string", "facebook_app_id", "723591907733842");
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -26,18 +30,18 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.google.firebase:firebase-core:9.6.1'
+    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.android.support:design:25.0.0'
+    compile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.google.firebase:firebase-core:9.6.1'
     compile 'com.google.firebase:firebase-auth:9.6.1'
     compile 'com.google.android.gms:play-services-auth:9.6.1'
     compile 'com.facebook.android:facebook-android-sdk:4.16.0'
-    testCompile 'junit:junit:4.12'
-    compile 'com.google.android.gms:play-services-maps:9.6.1'
     compile 'com.google.firebase:firebase-database:9.6.1'
-    compile 'com.google.android.gms:play-services-location:9.6.1'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'com.google.firebase:firebase-messaging:9.6.1'
-    compile 'com.android.support:design:25.0.0'
-    compile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.google.android.gms:play-services-maps:9.6.1'
+    compile 'com.google.android.gms:play-services-location:9.6.1'
 }
 apply plugin: 'com.google.gms.google-services'
