@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FireBaseDemo</string>
+    <string name="change_name">變更名稱</string>
+    <string name="login_out">登出</string>
+    <string name="loginFailed">登入錯誤</string>
+    <string name="please_input_message">請輸入密碼...</string>
+    <string name="send">傳送</string>
+    <string name="title_activity_maps">地圖</string>
+    <string name="plase_input_email_and_password">請輸入Email和密碼</string>
+    <string name="fb_login">Facebook登入</string>
+</resources>

@@ -51,13 +51,6 @@
         android:layout_height="40dp">
 
         <Button
-            android:text="First Login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/firstLoginButton"
-            android:layout_weight="1" />
-
-        <Button
             android:text="Login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,11 +66,18 @@
         android:layout_margin="5dp"
         android:background="@drawable/common_google_signin_btn_text_light" />
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/login_button"
+    <Button
+        android:id="@+id/facebookButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp" />
+        android:layout_marginBottom="30dp"
+        android:text="@string/fb_login"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/com_facebook_button_background" />
 </LinearLayout>

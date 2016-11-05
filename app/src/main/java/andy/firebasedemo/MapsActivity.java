@@ -19,8 +19,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -34,7 +32,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -48,12 +45,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
-import andy.firebasedemo.component.HeadShotMarker;
+import andy.firebasedemo.login.LoginActivity;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.adapter.MessageAdapter;
 import andy.firebasedemo.object.Member;
@@ -109,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case R.id.loginOut:
                         FireBaseManager.getInstance().loginOut();
                         mAuth.signOut();
-                        startActivity(new Intent(MapsActivity.this, LoginActivity.class));
+                        startActivity(new Intent(MapsActivity.this, MainActivity.class));
                         finish();
                         break;
 
@@ -235,7 +230,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
         }
-        // Begin polling for new location updates.
         startLocationUpdates();
     }
 

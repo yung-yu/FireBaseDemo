@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import andy.firebasedemo.login.LoginActivity;
+
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Button loginButton;
@@ -39,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         if(mAuth.getCurrentUser()==null){
             loginButton.setText("Login");
             startActivity(new Intent(this, LoginActivity.class));
-            finish();
         }else{
             loginButton.setText("Login out");
             startActivity(new Intent(this, MapsActivity.class));

@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">FireBaseDemo</string>
-    <string name="facebook_app_id">723591907733842</string>
+    <string name="facebook_app_id" translatable="false">723591907733842</string>
     <string name="title_activity_maps">Map</string>
     <string name="please_input_message">please input message...</string>
     <string name="send">send</string>
     <string name="login_out">login out</string>
     <string name="change_name">change Name</string>
-    <string name="loginout">loginout</string>
+    <string name="loginFailed">login failed</string>
+    <string name="plase_input_email_and_password">Please input email and password</string>
+    <string name="fb_login">FacebookLogin</string>
 </resources>
