@@ -9,4 +9,5 @@
     <string name="loginFailed">login failed</string>
     <string name="plase_input_email_and_password">Please input email and password</string>
     <string name="fb_login">FacebookLogin</string>
+    <string name="logining">Loginning</string>
 </resources>

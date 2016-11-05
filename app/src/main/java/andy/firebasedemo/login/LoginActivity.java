@@ -1,12 +1,15 @@
 package andy.firebasedemo.login;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.facebook.FacebookSdk;
 
@@ -27,7 +30,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     private Button googleAuthButton;
     private Button facebookButton;
     private LoginPresenterImp mLoginPresenterImp;
-
+    private ProgressDialog mProgressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,20 +67,34 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         mLoginPresenterImp.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public void setProgessBarVisiably(int visiably) {
 
+    @Override
+    public void setProgessBarShow(boolean isShow) {
+        if(mProgressBar == null){
+            mProgressBar = new ProgressDialog(this);
+            mProgressBar.setMessage(getString(R.string.logining));
+        }
+        if(isShow){
+            if(!mProgressBar.isShowing()){
+                mProgressBar.show();
+            }
+        }else{
+            if(mProgressBar.isShowing()){
+                mProgressBar.dismiss();
+            }
+        }
     }
 
     @Override
     public void LoginSuccess(LoginType type) {
-        Toast.makeText(this, type.toString()+" login success",Toast.LENGTH_SHORT).show();
         finish();
     }
 
     @Override
     public void LoginFailed(String msg) {
-        Toast.makeText(this, " login fail:"+msg,Toast.LENGTH_SHORT).show();
+        if(!TextUtils.isEmpty(msg)) {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -90,4 +107,6 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
            mLoginPresenterImp.doGoogleLogin();
        }
     }
+
+
 }

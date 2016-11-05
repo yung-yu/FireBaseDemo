@@ -9,7 +9,7 @@ import andy.firebasedemo.main.BaseView;
 
 public interface LoginContract {
 	interface View extends BaseView {
-		void setProgessBarVisiably(int visiably);
+		void setProgessBarShow(boolean isShow);
 
 		void LoginSuccess(LoginType type);
 

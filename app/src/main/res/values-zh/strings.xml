@@ -9,4 +9,5 @@
     <string name="title_activity_maps">地圖</string>
     <string name="plase_input_email_and_password">請輸入Email和密碼</string>
     <string name="fb_login">Facebook登入</string>
+    <string name="logining">登入中</string>
 </resources>

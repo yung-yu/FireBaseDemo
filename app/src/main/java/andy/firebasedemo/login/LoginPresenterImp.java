@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.widget.ProgressBar;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -47,6 +48,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 	private Fragment mFragment;
 	private Activity mActivity;
 
+
 	public LoginPresenterImp(Context context, Fragment fragment, LoginContract.View view) {
 		this.view = view;
 		this.context = context;
@@ -71,14 +73,13 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	@Override
 	public void doEmailLoginLogin(String email, String password) {
+		view.setProgessBarShow(true);
 		normalLogin(email,password);
 	}
 
 	@Override
 	public void doGoogleLogin() {
-		if (!(mActivity instanceof FragmentActivity)) {
-			new Throwable("Activity is must extend FragmentActivity");
-		}
+		view.setProgessBarShow(true);
 		GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
 				.requestIdToken(context.getString(R.string.default_web_client_id))
 				.requestEmail()
@@ -94,6 +95,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	@Override
 	public void doFacebookLogin() {
+		view.setProgessBarShow(true);
 		if (mCallbackManager == null) mCallbackManager = CallbackManager.Factory.create();
 		LoginManager.getInstance().registerCallback(mCallbackManager, mFacebookCallback);
 		if (mFragment != null) {
@@ -105,6 +107,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	@Override
 	public void doAnonymouslyLogin() {
+		view.setProgessBarShow(true);
 		FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
@@ -114,6 +117,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 					L.e(TAG, task.getException().toString());
 					view.LoginFailed(task.getException().getMessage());
 				}
+				view.setProgessBarShow(false);
 			}
 		});
 	}
@@ -155,12 +159,14 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 		public void onCancel() {
 			L.d(TAG, "facebook:onCancel");
 			view.LoginFailed(context.getString(R.string.loginFailed));
+			view.setProgessBarShow(false);
 		}
 
 		@Override
 		public void onError(FacebookException error) {
 			L.d(TAG, "facebook:onError:" + error.getMessage());
 			view.LoginFailed(error.getMessage());
+			view.setProgessBarShow(false);
 		}
 	};
 
@@ -178,6 +184,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 							L.e(TAG, "signInWithCredential" + task.getException().getMessage());
 							view.LoginFailed(task.getException().getMessage());
 						}
+						view.setProgessBarShow(false);
 
 					}
 				});
@@ -188,24 +195,23 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 		public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 			L.e(TAG, connectionResult.getErrorCode() + ":" + connectionResult.getErrorMessage());
 			view.LoginFailed(context.getString(R.string.loginFailed));
+			view.setProgessBarShow(false);
 		}
 	};
 
 	private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-		L.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
 		AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
 		FirebaseAuth.getInstance().signInWithCredential(credential)
 				.addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 					@Override
 					public void onComplete(@NonNull Task<AuthResult> task) {
-						L.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 						if (task.isSuccessful()) {
 							view.LoginSuccess(LoginType.Google);
 						} else {
 							L.e(TAG, task.getException().getMessage());
 							view.LoginFailed(task.getException().getMessage());
 						}
+						view.setProgessBarShow(false);
 					}
 				});
 	}
@@ -213,14 +219,15 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 	private void normalLogin(final String email, final String password) {
 		if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
 			view.LoginFailed(context.getString(R.string.plase_input_email_and_password));
+			view.setProgessBarShow(false);
 			return;
 		}
 		FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
-				L.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 				if (task.isSuccessful()) {
 					view.LoginSuccess(LoginType.normal);
+					view.setProgessBarShow(false);
 				} else {
 					L.e(TAG, task.getException().toString());
 					FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -233,11 +240,11 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 								L.e(TAG, task.getException().getMessage());
 								view.LoginFailed(task.getException().getMessage());
 							}
+							view.setProgessBarShow(false);
 						}
 					});
 				}
 			}
 		});
-
 	}
 }
