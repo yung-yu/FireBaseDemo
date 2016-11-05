@@ -9,4 +9,6 @@
     <string name="plase_input_email_and_password">Please input email and password</string>
     <string name="fb_login">FacebookLogin</string>
     <string name="logining">Loginning</string>
+    <string name="open_drawer">open</string>
+    <string name="close_drawer">close</string>
 </resources>

@@ -71,8 +71,6 @@ public class FireBaseManager {
 		FirebaseUser user = mAuth.getCurrentUser();
 		if (user != null) {
 			mOnLineDataBase.child(user.getUid()).removeValue();
-			user.delete();
-
 		}
 	}
 
@@ -144,6 +142,14 @@ public class FireBaseManager {
 			}
 		}.start();
 
+	}
+
+	public void signOut(){
+		if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+			loginOut();
+			FirebaseAuth.getInstance().getCurrentUser().delete();
+			mAuth.signOut();
+		}
 	}
 
 	public void sendToken(String token) {

@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:icon="@drawable/ic_power_settings_new_black_24dp"
         android:id="@+id/loginOut"
         android:title="@string/login_out"
-        android:visible="true" />
+        />
 </menu>

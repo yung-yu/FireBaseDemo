@@ -50,7 +50,6 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	public LoginPresenterImp(Fragment fragment, LoginContract.View loginView) {
 		this.loginView = loginView;
-		this.loginView.setPresenter(this);
 		this.context = fragment.getContext();
 		this.mActivity = fragment.getActivity();
 		this.mFragment = fragment;
@@ -60,7 +59,6 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	public LoginPresenterImp(Activity activity, LoginContract.View loginView) {
 		this.loginView = loginView;
-		loginView.setPresenter(this);
 		this.context = activity;
 		this.mActivity = activity;
 
