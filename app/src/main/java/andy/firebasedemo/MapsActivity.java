@@ -215,10 +215,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void sendNotifcationMessageFinish() {
-
-    }
 
     @Override
     public void onNotify(List<Message> data) {

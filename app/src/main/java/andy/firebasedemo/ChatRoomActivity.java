@@ -134,11 +134,6 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 	}
 
 	@Override
-	public void sendNotifcationMessageFinish() {
-
-	}
-
-	@Override
 	public void onNotify(List<Message> data) {
 		mMsgAdapter.setData(data);
 		mMsgAdapter.notifyDataSetChanged();
