@@ -118,7 +118,9 @@ public class FireBaseManager {
 		item.put("msg", changeText);
 		mMessagesDataBase.child(msgID).updateChildren(item);
 	}
-
+	public void deleteMessage(String msgID) {
+		mMessagesDataBase.child(msgID).removeValue();
+	}
 	public Member getMyMember() {
 		return myMember;
 	}

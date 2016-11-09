@@ -50,8 +50,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 		listView = (ListView) findViewById(R.id.listview);
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-		swipeRefreshLayout.setNestedScrollingEnabled(true);
-
+		swipeRefreshLayout.setEnabled(false);
 		setSupportActionBar(mToolbar);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -80,6 +79,26 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 						})
 						.setNegativeButton("cancel", null)
 						.create().show();
+			}
+		});
+		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+				final Message msg = mMsgAdapter.getItem(i);
+				new AlertDialog.Builder(ChatRoomActivity.this)
+						.setMessage(R.string.app_name)
+						.setMessage("請問要刪除訊息嗎？")
+						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialogInterface, int i) {
+
+								FireBaseManager.getInstance().deleteMessage(msg.id);
+								dialogInterface.cancel();
+							}
+						})
+						.setNegativeButton("cancel", null)
+						.create().show();
+				return true;
 			}
 		});
 		mMessagePresenterImp = new MessagePresenterImp(this, this);

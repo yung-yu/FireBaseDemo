@@ -2,11 +2,14 @@ package andy.firebasedemo.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +63,14 @@ public class MsgAdapter extends BaseAdapter {
 		Message message = getItem(i);
 		text.setTextColor(Color.BLACK);
 		if(message != null){
-			text.setText(message.name+":"+message.msg);
+			if(FirebaseAuth.getInstance().getCurrentUser() != null
+					&& message.fromId.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+				text.setGravity(Gravity.RIGHT);
+				text.setText(message.msg);
+			}else {
+				text.setGravity(Gravity.LEFT);
+				text.setText(message.name + ":" + message.msg);
+			}
 		}
 		return view;
 	}

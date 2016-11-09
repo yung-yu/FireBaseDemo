@@ -59,7 +59,6 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 							String msg = et.getText().toString();
 							if(!TextUtils.isEmpty(msg)){
 								FireBaseManager.getInstance().sendNotification(member.token, member.name, msg);
-								messageView.sendNotifcationMessageFinish();
 							}
 						}
 					})
