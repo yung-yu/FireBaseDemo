@@ -1,5 +1,6 @@
 package andy.firebasedemo.login;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,7 +24,7 @@ import andy.firebasedemo.R;
  * Created by andyli on 2016/10/8.
  */
 
-public class LoginDialogFragment extends DialogFragment implements View.OnClickListener{
+public class LoginDialogFragment extends DialogFragment implements View.OnClickListener, LoginContract.View{
     private final static String TAG = "LoginDialogFragment";
     private EditText emailEditText;
     private EditText passwordEditText;
@@ -32,8 +33,10 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     private Button facebookButton;
     private LoginPresenterImp mLoginPresenterImp;
     private LoginContract.View loginView;
+    private ProgressDialog mProgressBar;
 
     public LoginDialogFragment() {
+        this.loginView = this;
     }
 
     public LoginDialogFragment(LoginContract.View loginView) {
@@ -73,6 +76,10 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     public void onStart() {
         super.onStart();
         mLoginPresenterImp.start();
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 
     @Override
@@ -101,4 +108,32 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     }
 
 
+    @Override
+    public void setProgessBarShow(boolean isShow) {
+        if(mProgressBar == null){
+            mProgressBar = new ProgressDialog(getActivity());
+            mProgressBar.setMessage(getString(R.string.logining));
+        }
+        if(isShow){
+            if(!mProgressBar.isShowing()){
+                mProgressBar.show();
+            }
+        }else{
+            if(mProgressBar.isShowing()){
+                mProgressBar.dismiss();
+            }
+        }
+    }
+
+    @Override
+    public void LoginSuccess(LoginType type) {
+        dismiss();
+    }
+
+    @Override
+    public void LoginFailed(String msg) {
+        if(!TextUtils.isEmpty(msg)) {
+            Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        }
+    }
 }

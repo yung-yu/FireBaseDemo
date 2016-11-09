@@ -13,6 +13,7 @@
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
         android:gravity="center"
+        android:visibility="gone"
         />
 
     <EditText
@@ -24,7 +25,8 @@
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
         android:gravity="center"
-        android:hint="email"/>
+        android:hint="email"
+        android:visibility="gone"/>
     <TextView
         android:text="Password:"
         android:layout_width="match_parent"
@@ -32,6 +34,7 @@
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
         android:gravity="center"
+        android:visibility="gone"
         />
 
     <EditText
@@ -43,12 +46,14 @@
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
         android:gravity="center"
-        android:hint="password"/>
+        android:hint="password"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="40dp">
+        android:layout_height="40dp"
+        android:visibility="gone">
 
         <Button
             android:text="Login"
@@ -64,6 +69,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/googleAuthButton"
         android:layout_margin="5dp"
+        android:visibility="gone"
         android:background="@drawable/common_google_signin_btn_text_light" />
 
     <Button

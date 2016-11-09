@@ -12,16 +12,16 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Message {
     public String name;
-    public String uid;
+    public String fromId;
     public String msg;
     public long time;
-
+    public String id;
     public Message() {
 
     }
 
-    public Message(String uid, String name, String msg, long time) {
-        this.uid = uid;
+    public Message(String fromId, String name, String msg, long time) {
+        this.fromId = fromId;
         this.name = name;
         this.msg = msg;
         this.time = time;
@@ -30,12 +30,11 @@ public class Message {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("uid", uid);
+        result.put("fromId", fromId);
         result.put("name", name);
         result.put("msg", msg);
         result.put("time", time);
         return result;
     }
-
 
 }

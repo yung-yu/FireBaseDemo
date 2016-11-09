@@ -46,6 +46,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 	private CallbackManager mCallbackManager;
 	private Fragment mFragment;
 	private Activity mActivity;
+	private GoogleApiClient mGoogleApiClient;
 
 
 	public LoginPresenterImp(Fragment fragment, LoginContract.View loginView) {
@@ -78,10 +79,12 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 				.requestEmail()
 				.requestProfile()
 				.build();
-		GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(context)
-				.enableAutoManage((FragmentActivity) mActivity, connectionFailedListener)
-				.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-				.build();
+		if(mGoogleApiClient == null) {
+			mGoogleApiClient = new GoogleApiClient.Builder(context)
+					.enableAutoManage((FragmentActivity) mActivity, connectionFailedListener)
+					.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+					.build();
+		}
 		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
 		mActivity.startActivityForResult(signInIntent, GOOGLE_AUTH_REQUEST_CODE);
 	}

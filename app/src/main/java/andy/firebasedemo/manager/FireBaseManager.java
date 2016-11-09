@@ -57,11 +57,11 @@ public class FireBaseManager {
 		mMessagesDataBase = FirebaseDatabase.getInstance().getReference("messages");
 	}
 
-	public void login(LatLng latLng, OnCompleteListener onCompleteListener) {
+	public void login(OnCompleteListener onCompleteListener) {
 		FirebaseUser user = mAuth.getCurrentUser();
 		if (user != null) {
 			Log.d(TAG, user.getProviderId());
-			myMember = new Member(user.getDisplayName(), user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "", latLng.latitude, latLng.longitude, System.currentTimeMillis(), FirebaseInstanceId.getInstance().getToken());
+			myMember = new Member(user.getDisplayName(), user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "", System.currentTimeMillis(), FirebaseInstanceId.getInstance().getToken());
 			mOnLineDataBase.child(user.getUid()).setValue(myMember).addOnCompleteListener(onCompleteListener);
 			requestFBUserId();
 		}
@@ -108,8 +108,16 @@ public class FireBaseManager {
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
 		mMessagesDataBase.push().setValue(item).addOnCompleteListener(listener);
+//		HashMap<String,Object>  value= new HashMap<>();
+//		value.put("title", item.msg);
+//		FirebaseDatabase.getInstance().getReference("locations").child(item.fromId).updateChildren(value);
 	}
 
+	public void updateMessage(String msgID, String changeText) {
+		HashMap<String, Object> item = new HashMap<>();
+		item.put("msg", changeText);
+		mMessagesDataBase.child(msgID).updateChildren(item);
+	}
 
 	public Member getMyMember() {
 		return myMember;

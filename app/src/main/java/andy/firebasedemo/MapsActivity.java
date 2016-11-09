@@ -35,7 +35,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 
-import andy.firebasedemo.R;
+import java.util.List;
+
 import andy.firebasedemo.login.LoginContract;
 import andy.firebasedemo.login.LoginDialogFragment;
 import andy.firebasedemo.login.LoginType;
@@ -45,6 +46,7 @@ import andy.firebasedemo.map.MapContract;
 import andy.firebasedemo.map.MapPresenterImp;
 import andy.firebasedemo.message.MessageContract;
 import andy.firebasedemo.message.MessagePresenterImp;
+import andy.firebasedemo.object.Message;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,MapContract.View, MessageContract.View,LoginContract.View,
         View.OnClickListener {
@@ -143,8 +145,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapPresenterImp.stop();
         mMessagePresenterImp.stop();
         FirebaseAuth.getInstance().removeAuthStateListener(mAuthStateListener);
-        FireBaseManager.getInstance().loginOut();
         mMessageAdapter.stopLisetener();
+        mGoogleMap.clear();
     }
 
     @Override
@@ -158,9 +160,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         mGoogleMap = googleMap;
+        mMapPresenterImp.setGoogleMap(googleMap);
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
         googleMap.getUiSettings().setRotateGesturesEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
+        googleMap.setMyLocationEnabled(true);
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(final Marker marker) {
@@ -213,6 +217,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void sendNotifcationMessageFinish() {
+
+    }
+
+    @Override
+    public void onNotify(List<Message> data) {
+
+    }
+
+    @Override
+    public void setRefresh(boolean isRefresh) {
 
     }
 

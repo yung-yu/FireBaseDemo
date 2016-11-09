@@ -1,5 +1,6 @@
 package andy.firebasedemo.map;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -21,6 +22,6 @@ public interface MapContract {
 	}
 
 	interface Presenter extends BasePresenter {
-		void Login();
+		void setGoogleMap(GoogleMap map);
 	}
 }
