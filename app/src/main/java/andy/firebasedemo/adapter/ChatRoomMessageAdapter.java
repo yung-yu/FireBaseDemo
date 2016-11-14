@@ -82,8 +82,10 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
     class ViewHolder{
 		ImageView leftHeader;
 		ImageView rightHeader;
-		CardView cardView;
-		TextView text;
+		CardView leftTextContent;
+		CardView rightTextContent;
+		TextView leftText;
+		TextView rightText;
 	}
 	private boolean isMe(String uid){
 		return  FirebaseAuth.getInstance().getCurrentUser() != null
@@ -97,8 +99,10 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 			view = LayoutInflater.from(context).inflate(R.layout.adapter_message_item, null);
 			vh.leftHeader = (ImageView) view.findViewById(R.id.left_header);
 			vh.rightHeader =  (ImageView) view.findViewById(R.id.right_header);
-			vh.text = (TextView) view.findViewById(R.id.text);
-			vh.cardView = (CardView) view.findViewById(R.id.textContent);
+			vh.leftText = (TextView) view.findViewById(R.id.leftText);
+			vh.leftTextContent = (CardView) view.findViewById(R.id.leftTextContent);
+			vh.rightText = (TextView) view.findViewById(R.id.rightText);
+			vh.rightTextContent = (CardView) view.findViewById(R.id.rightTextContent);
 			view.setTag(vh);
 		}else{
 			vh = (ViewHolder) view.getTag();
@@ -106,9 +110,13 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 		Message message = getItem(i);
 		if(message != null){
 			if(isMe(message.fromId)){
-				vh.text.setGravity(Gravity.RIGHT|Gravity.TOP);
 				vh.leftHeader.setVisibility(View.GONE);
 				vh.rightHeader.setVisibility(View.VISIBLE);
+				vh.leftText.setVisibility(View.GONE);
+				vh.leftTextContent.setVisibility(View.GONE);
+				vh.rightText.setVisibility(View.VISIBLE);
+				vh.rightTextContent.setVisibility(View.VISIBLE);
+				vh.rightText.setText(message.name + "說:\n" + message.msg);
 				vh.rightHeader.setTag(message.icon);
 				vh.leftHeader.setTag(null);
 				Bitmap bitmap = imageLoader.getMemoryCache().get(message.icon);
@@ -117,22 +125,25 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 				}else{
 					imageLoader.displayImage(message.icon, vh.rightHeader, getDisplayImageOptions());
 				}
-				((RelativeLayout.LayoutParams)vh.cardView.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 1);
+
 			}else {
-				vh.text.setGravity(Gravity.LEFT|Gravity.TOP);
 				vh.leftHeader.setVisibility(View.VISIBLE);
 				vh.rightHeader.setVisibility(View.GONE);
 				vh.rightHeader.setTag(null);
 				vh.leftHeader.setTag(message.icon);
+				vh.leftText.setVisibility(View.VISIBLE);
+				vh.leftTextContent.setVisibility(View.VISIBLE);
+				vh.rightText.setVisibility(View.GONE);
+				vh.rightTextContent.setVisibility(View.GONE);
+				vh.leftText.setText(message.name + "說:\n" + message.msg);
 				Bitmap bitmap = imageLoader.getMemoryCache().get(message.icon);
 				if(bitmap != null && !bitmap.isRecycled()) {
 					vh.leftHeader.setImageBitmap(bitmap);
 				}else{
 					imageLoader.displayImage(message.icon, vh.leftHeader, getDisplayImageOptions());
 				}
-				((RelativeLayout.LayoutParams)vh.cardView.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
 			}
-			vh.text.setText(message.name + "說:\n" + message.msg);
+
 		}
 		return view;
 	}

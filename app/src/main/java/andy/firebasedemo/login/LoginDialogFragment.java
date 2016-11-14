@@ -137,7 +137,7 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
 
     @Override
     public void LoginSuccess(LoginType type) {
-        Toast.makeText(getActivity(), "登入成功", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.login_success, Toast.LENGTH_SHORT).show();
         if(loginSuccessListener != null){
             loginSuccessListener.onLogin();
         }

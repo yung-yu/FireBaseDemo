@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">FireBaseDemo</string>
-    <string name="title_activity_maps">Map</string>
     <string name="please_input_message">please input message...</string>
     <string name="send">send</string>
     <string name="login">login</string>
@@ -16,4 +15,5 @@
     <string name="delete_tip">Are you sure to delete？</string>
     <string name="ok">OK</string>
     <string name="cancel">cancel</string>
+    <string name="login_success">Login success</string>
 </resources>

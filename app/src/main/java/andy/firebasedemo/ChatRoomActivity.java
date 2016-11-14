@@ -171,6 +171,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 					   public void onClick(DialogInterface dialogInterface, int i) {
 						   FirebaseAuth.getInstance().getCurrentUser().delete();
 						   FirebaseAuth.getInstance().signOut();
+						   mMsgAdapter.notifyDataSetChanged();
 						   Toast.makeText(ChatRoomActivity.this, "登出成功", Toast.LENGTH_SHORT).show();
 					   }
 				   }).setNegativeButton("cancel", null)

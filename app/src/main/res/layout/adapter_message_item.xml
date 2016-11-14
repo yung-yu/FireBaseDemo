@@ -21,7 +21,26 @@
         android:layout_weight="1">
 
         <android.support.v7.widget.CardView
-            android:id="@+id/textContent"
+            android:id="@+id/leftTextContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            app:cardBackgroundColor="#fff"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="5dp"
+            app:contentPadding="5dp">
+
+            <TextView
+                android:id="@+id/leftText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top|left"
+                android:text="test"
+
+                />
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            android:id="@+id/rightTextContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -32,11 +51,11 @@
             app:contentPadding="5dp">
 
             <TextView
-                android:id="@+id/text"
+                android:id="@+id/rightText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="test"
-
+                android:gravity="top|right"
                 />
         </android.support.v7.widget.CardView>
     </RelativeLayout>
