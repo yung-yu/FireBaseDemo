@@ -102,7 +102,7 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 	public void start() {
 		data = new ArrayList<>();
 		messageDatabase = FirebaseDatabase.getInstance().getReference("messages");
-		messageDatabase.keepSynced(true);
+		messageDatabase.keepSynced(false);
 		messageView.setRefresh(true);
 		messageDatabase.addValueEventListener(messageListener);
 	}

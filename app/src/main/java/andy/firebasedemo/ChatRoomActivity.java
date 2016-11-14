@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
@@ -65,19 +66,22 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 			@Override
 			public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
 				final Message msg = mMsgAdapter.getItem(i);
-				new AlertDialog.Builder(ChatRoomActivity.this)
-						.setMessage(R.string.app_name)
-						.setMessage(R.string.delete_tip)
-						.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialogInterface, int i) {
+				FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+				if(user != null && msg.fromId.equals(user.getUid())) {
+					new AlertDialog.Builder(ChatRoomActivity.this)
+							.setMessage(R.string.app_name)
+							.setMessage(R.string.delete_tip)
+							.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialogInterface, int i) {
 
-								FireBaseManager.getInstance().deleteMessage(msg.id);
-								dialogInterface.cancel();
-							}
-						})
-						.setNegativeButton(R.string.cancel, null)
-						.create().show();
+									FireBaseManager.getInstance().deleteMessage(msg.id);
+									dialogInterface.cancel();
+								}
+							})
+							.setNegativeButton(R.string.cancel, null)
+							.create().show();
+				}
 				return true;
 			}
 		});
@@ -166,15 +170,15 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 			   new AlertDialog.Builder(this)
 				   .setTitle(R.string.app_name)
 				   .setMessage(R.string.login_out)
-				   .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+				   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 					   @Override
 					   public void onClick(DialogInterface dialogInterface, int i) {
 						   FirebaseAuth.getInstance().getCurrentUser().delete();
 						   FirebaseAuth.getInstance().signOut();
 						   mMsgAdapter.notifyDataSetChanged();
-						   Toast.makeText(ChatRoomActivity.this, "登出成功", Toast.LENGTH_SHORT).show();
+						   Toast.makeText(ChatRoomActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
 					   }
-				   }).setNegativeButton("cancel", null)
+				   }).setNegativeButton(R.string.cancel, null)
 				   .create().show();
 			   break;
 		   case R.id.loginIn:
