@@ -41,7 +41,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 	private final static String TAG = "LoginPresenterImp";
 	private final static String[] FACEBOOK_PERMISSIONS = {"email", "public_profile"};
 	private final static int GOOGLE_AUTH_REQUEST_CODE = 9898;
-	public LoginContract.View  loginView;
+	public LoginContract.View loginView;
 	public Context context;
 	private CallbackManager mCallbackManager;
 	private Fragment mFragment;
@@ -68,7 +68,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 	@Override
 	public void doEmailLoginLogin(String email, String password) {
 		loginView.setProgessBarShow(true);
-		normalLogin(email,password);
+		normalLogin(email, password);
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 				.requestEmail()
 				.requestProfile()
 				.build();
-		if(mGoogleApiClient == null) {
+		if (mGoogleApiClient == null) {
 			mGoogleApiClient = new GoogleApiClient.Builder(context)
 					.enableAutoManage((FragmentActivity) mActivity, connectionFailedListener)
 					.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -232,7 +232,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 							L.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 							if (task.isSuccessful()) {
 								loginView.LoginSuccess(LoginType.normal);
-							} else{
+							} else {
 								L.e(TAG, task.getException().getMessage());
 								loginView.LoginFailed(task.getException().getMessage());
 							}

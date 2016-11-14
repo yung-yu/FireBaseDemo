@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -69,7 +70,8 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 
 	@Override
 	public  void sendMessage(String text) {
-		if(FirebaseAuth.getInstance().getCurrentUser() == null){
+		FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+		if(user == null){
 			messageView.sendMessageFailed(context.getString(R.string.please_login));
 			return;
 		}
@@ -78,7 +80,11 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 			return;
 		}
 		messageView.sendMessageReady();
-		Message msg = new Message(FirebaseAuth.getInstance().getCurrentUser().getUid(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), text, System.currentTimeMillis());
+		Message msg = new Message(user.getUid(),
+				user.getDisplayName(),
+				user.getPhotoUrl() != null? user.getPhotoUrl().toString() : "",
+				text,
+				System.currentTimeMillis());
 		FireBaseManager.getInstance().sendMessage(msg, new OnCompleteListener<Void>() {
 			@Override
 			public void onComplete(@NonNull Task<Void> task) {
@@ -96,6 +102,7 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 	public void start() {
 		data = new ArrayList<>();
 		messageDatabase = FirebaseDatabase.getInstance().getReference("messages");
+		messageView.setRefresh(true);
 		messageDatabase.addValueEventListener(messageListener);
 	}
 

@@ -3,7 +3,6 @@ package andy.firebasedemo;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,13 +13,15 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
-import andy.firebasedemo.adapter.MsgAdapter;
+import andy.firebasedemo.adapter.ChatRoomMessageAdapter;
 import andy.firebasedemo.login.LoginDialogFragment;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.message.MessageContract;
@@ -35,22 +36,22 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 	private Button button;
 	private ListView listView;
 	private MessagePresenterImp mMessagePresenterImp;
-	private MsgAdapter mMsgAdapter;
+	private ChatRoomMessageAdapter mMsgAdapter;
 	private Toolbar mToolbar;
 	private LoginDialogFragment mLoginDialogFragment;
-	private SwipeRefreshLayout swipeRefreshLayout;
+	private ProgressBar toolbarProgressBar;
 
 
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
+		FacebookSdk.sdkInitialize(getApplicationContext());
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chatroom);
 		editText = (EditText) findViewById(R.id.editText);
 		button = (Button) findViewById(R.id.button);
 		listView = (ListView) findViewById(R.id.listview);
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
-		swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-		swipeRefreshLayout.setEnabled(false);
+		toolbarProgressBar = (ProgressBar) findViewById(R.id.toolbar_progress_bar);
 		setSupportActionBar(mToolbar);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -58,37 +59,16 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 				mMessagePresenterImp.sendMessage(editText.getText().toString());
 			}
 		});
-		mMsgAdapter = new MsgAdapter(this);
+		mMsgAdapter = new ChatRoomMessageAdapter(this);
 		listView.setAdapter(mMsgAdapter);
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				final Message msg = mMsgAdapter.getItem(i);
-				final EditText et = new EditText(ChatRoomActivity.this);
-				et.setText(msg.msg);
-				new AlertDialog.Builder(ChatRoomActivity.this)
-						.setMessage(R.string.app_name)
-						.setMessage("請輸入變更內容")
-						.setView(et)
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialogInterface, int i) {
-								FireBaseManager.getInstance().updateMessage(msg.id, et.getText().toString());
-								dialogInterface.cancel();
-							}
-						})
-						.setNegativeButton("cancel", null)
-						.create().show();
-			}
-		});
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
 				final Message msg = mMsgAdapter.getItem(i);
 				new AlertDialog.Builder(ChatRoomActivity.this)
 						.setMessage(R.string.app_name)
-						.setMessage("請問要刪除訊息嗎？")
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						.setMessage(R.string.delete_tip)
+						.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -96,7 +76,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 								dialogInterface.cancel();
 							}
 						})
-						.setNegativeButton("cancel", null)
+						.setNegativeButton(R.string.cancel, null)
 						.create().show();
 				return true;
 			}
@@ -161,7 +141,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 
 	@Override
 	public void setRefresh(boolean isRefresh) {
-		swipeRefreshLayout.setRefreshing(isRefresh);
+		toolbarProgressBar.setVisibility(isRefresh?View.VISIBLE:View.GONE);
 	}
 
 	@Override
@@ -191,6 +171,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 					   public void onClick(DialogInterface dialogInterface, int i) {
 						   FirebaseAuth.getInstance().getCurrentUser().delete();
 						   FirebaseAuth.getInstance().signOut();
+						   Toast.makeText(ChatRoomActivity.this, "登出成功", Toast.LENGTH_SHORT).show();
 					   }
 				   }).setNegativeButton("cancel", null)
 				   .create().show();
@@ -202,9 +183,17 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 		return true;
 	}
 
+
+
 	private void showLoginDialog(){
 		if(mLoginDialogFragment == null){
 			mLoginDialogFragment = new LoginDialogFragment();
+			mLoginDialogFragment.setOnLoginSuccessListener(new LoginDialogFragment.OnLoginSuccessListener() {
+				@Override
+				public void onLogin() {
+					mMsgAdapter.notifyDataSetChanged();
+				}
+			});
 		}
 		if(!mLoginDialogFragment.isAdded()) {
 			mLoginDialogFragment.show(getSupportFragmentManager(),

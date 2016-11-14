@@ -13,4 +13,7 @@
     <string name="open_drawer">open</string>
     <string name="close_drawer">close</string>
     <string name="please_login">Please login first!</string>
+    <string name="delete_tip">Are you sure to delete？</string>
+    <string name="ok">OK</string>
+    <string name="cancel">cancel</string>
 </resources>

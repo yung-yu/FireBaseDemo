@@ -13,16 +13,19 @@ import java.util.Map;
 public class Message {
     public String name;
     public String fromId;
+    public String icon;
     public String msg;
     public long time;
     public String id;
+
     public Message() {
 
     }
 
-    public Message(String fromId, String name, String msg, long time) {
+    public Message(String fromId, String name, String icon, String msg, long time) {
         this.fromId = fromId;
         this.name = name;
+        this.icon = icon;
         this.msg = msg;
         this.time = time;
     }

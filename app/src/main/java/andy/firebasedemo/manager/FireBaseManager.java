@@ -108,9 +108,6 @@ public class FireBaseManager {
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
 		mMessagesDataBase.push().setValue(item).addOnCompleteListener(listener);
-//		HashMap<String,Object>  value= new HashMap<>();
-//		value.put("title", item.msg);
-//		FirebaseDatabase.getInstance().getReference("locations").child(item.fromId).updateChildren(value);
 	}
 
 	public void updateMessage(String msgID, String changeText) {

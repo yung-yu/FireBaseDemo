@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 
+import andy.firebasedemo.ChatRoomActivity;
 import andy.firebasedemo.R;
 
 /**
@@ -34,6 +35,15 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     private LoginPresenterImp mLoginPresenterImp;
     private LoginContract.View loginView;
     private ProgressDialog mProgressBar;
+    private OnLoginSuccessListener loginSuccessListener;
+
+    public interface OnLoginSuccessListener{
+        void onLogin();
+    }
+
+    public void setOnLoginSuccessListener(OnLoginSuccessListener loginSuccessListener) {
+        this.loginSuccessListener = loginSuccessListener;
+    }
 
     public LoginDialogFragment() {
         this.loginView = this;
@@ -127,6 +137,10 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
 
     @Override
     public void LoginSuccess(LoginType type) {
+        Toast.makeText(getActivity(), "登入成功", Toast.LENGTH_SHORT).show();
+        if(loginSuccessListener != null){
+            loginSuccessListener.onLogin();
+        }
         dismiss();
     }
 
