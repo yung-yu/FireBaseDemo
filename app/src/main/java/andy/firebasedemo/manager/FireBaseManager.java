@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
@@ -38,6 +39,7 @@ public class FireBaseManager {
 	public static final MediaType JSON
 			= MediaType.parse("application/json; charset=utf-8");
 
+
 	public static FireBaseManager getInstance() {
 		if (instance == null) {
 			instance = new FireBaseManager();
@@ -46,14 +48,14 @@ public class FireBaseManager {
 	}
 
 	private FirebaseAuth mAuth;
-	private DatabaseReference mOnLineDataBase;
+	private DatabaseReference mMemberDataBase;
 	private DatabaseReference mMessagesDataBase;
 	private Member myMember;
 
 
 	public FireBaseManager() {
 		mAuth = FirebaseAuth.getInstance();
-		mOnLineDataBase = FirebaseDatabase.getInstance().getReference("users");
+		mMemberDataBase = FirebaseDatabase.getInstance().getReference("users");
 		mMessagesDataBase = FirebaseDatabase.getInstance().getReference("messages");
 	}
 
@@ -61,8 +63,10 @@ public class FireBaseManager {
 		FirebaseUser user = mAuth.getCurrentUser();
 		if (user != null) {
 			Log.d(TAG, user.getProviderId());
-			myMember = new Member(user.getDisplayName(), user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "", System.currentTimeMillis(), FirebaseInstanceId.getInstance().getToken());
-			mOnLineDataBase.child(user.getUid()).setValue(myMember).addOnCompleteListener(onCompleteListener);
+			myMember = new Member(user.getDisplayName(),
+					user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "",
+					System.currentTimeMillis(), FirebaseInstanceId.getInstance().getToken(), Member.STATUS_ONLINE);
+			mMemberDataBase.child(user.getUid()).updateChildren(myMember.toMap()).addOnCompleteListener(onCompleteListener);
 			requestFBUserId();
 		}
 	}
@@ -70,7 +74,9 @@ public class FireBaseManager {
 	public void loginOut() {
 		FirebaseUser user = mAuth.getCurrentUser();
 		if (user != null) {
-			mOnLineDataBase.child(user.getUid()).removeValue();
+			HashMap<String, Object> item = new HashMap<>();
+			item.put("status", Member.STATUS_OFFLINE);
+			mMemberDataBase.child(user.getUid()).updateChildren(item);
 		}
 	}
 
@@ -108,6 +114,14 @@ public class FireBaseManager {
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
 		mMessagesDataBase.push().setValue(item).addOnCompleteListener(listener);
+		List<Member> offlineMembers = MemberManager.getInstance().getOffLineMember();
+		Member myMember = MemberManager.getInstance().getMemberById(item.fromId);
+		if(offlineMembers.size() > 0){
+			for(Member member : offlineMembers){
+				sendNotification(member.token, myMember.name, item.msg);
+			}
+		}
+
 	}
 
 	public void updateMessage(String msgID, String changeText) {
@@ -162,7 +176,7 @@ public class FireBaseManager {
 	public void sendToken(String token) {
 		FirebaseUser user = mAuth.getCurrentUser();
 		if (user != null) {
-			mOnLineDataBase.child(user.getUid()).child("token").setValue(token);
+			mMemberDataBase.child(user.getUid()).child("token").setValue(token);
 		}
 	}
 }

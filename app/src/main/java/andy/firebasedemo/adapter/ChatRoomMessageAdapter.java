@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import andy.firebasedemo.R;
+import andy.firebasedemo.manager.MemberManager;
+import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
 
 
@@ -108,7 +110,9 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 			vh = (ViewHolder) view.getTag();
 		}
 		Message message = getItem(i);
+
 		if(message != null){
+			Member member = MemberManager.getInstance().getMemberById(message.fromId);
 			if(isMe(message.fromId)){
 				vh.leftHeader.setVisibility(View.GONE);
 				vh.rightHeader.setVisibility(View.VISIBLE);
@@ -116,31 +120,31 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 				vh.leftTextContent.setVisibility(View.GONE);
 				vh.rightText.setVisibility(View.VISIBLE);
 				vh.rightTextContent.setVisibility(View.VISIBLE);
-				vh.rightText.setText(message.name + "說:\n" + message.msg);
-				vh.rightHeader.setTag(message.icon);
+				vh.rightText.setText(member.name + "說:\n" + message.msg);
+				vh.rightHeader.setTag(member.icon);
 				vh.leftHeader.setTag(null);
-				Bitmap bitmap = imageLoader.getMemoryCache().get(message.icon);
+				Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
 				if(bitmap != null && !bitmap.isRecycled()) {
 					vh.rightHeader.setImageBitmap(bitmap);
 				}else{
-					imageLoader.displayImage(message.icon, vh.rightHeader, getDisplayImageOptions());
+					imageLoader.displayImage(member.icon, vh.rightHeader, getDisplayImageOptions());
 				}
 
 			}else {
 				vh.leftHeader.setVisibility(View.VISIBLE);
 				vh.rightHeader.setVisibility(View.GONE);
 				vh.rightHeader.setTag(null);
-				vh.leftHeader.setTag(message.icon);
+				vh.leftHeader.setTag(member.icon);
 				vh.leftText.setVisibility(View.VISIBLE);
 				vh.leftTextContent.setVisibility(View.VISIBLE);
 				vh.rightText.setVisibility(View.GONE);
 				vh.rightTextContent.setVisibility(View.GONE);
-				vh.leftText.setText(message.name + "說:\n" + message.msg);
-				Bitmap bitmap = imageLoader.getMemoryCache().get(message.icon);
+				vh.leftText.setText(member.name + "說:\n" + message.msg);
+				Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
 				if(bitmap != null && !bitmap.isRecycled()) {
 					vh.leftHeader.setImageBitmap(bitmap);
 				}else{
-					imageLoader.displayImage(message.icon, vh.leftHeader, getDisplayImageOptions());
+					imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
 				}
 			}
 

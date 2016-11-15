@@ -12,19 +12,23 @@ import java.util.Map;
  */
 @IgnoreExtraProperties
 public class Member {
+    public static final int STATUS_ONLINE = 1;
+    public static final int STATUS_OFFLINE = 0;
     public String name;
     public String icon;
     public long time;
     public String token;
+    public int status;
 
     public Member() {
     }
 
-    public Member(String name, String icon, long time, String token) {
+    public Member(String name, String icon, long time, String token, int status) {
         this.name = name;
         this.icon = icon;
         this.time = time;
         this.token = token;
+        this.status = status;
     }
 
 
@@ -35,6 +39,7 @@ public class Member {
         result.put("icon", icon);
         result.put("time", time);
         result.put("token", token);
+        result.put("status", status);
         return result;
     }
 

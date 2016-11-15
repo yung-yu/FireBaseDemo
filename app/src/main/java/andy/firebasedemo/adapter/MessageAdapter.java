@@ -47,7 +47,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> impl
          Message msg = data.get(position);
          if(msg != null){
              holder.text1.setTextColor(Color.WHITE);
-             holder.text1.setText(msg.name+":"+msg.msg);
+             holder.text1.setText(":"+msg.msg);
          }
     }
 

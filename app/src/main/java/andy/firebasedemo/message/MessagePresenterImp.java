@@ -45,26 +45,25 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 		this.context = context;
 	}
 
-
 	@Override
 	public void sendNotifcationMessage(String uid) {
 		final EditText et = new EditText(context);
 		final Member member = MemberManager.getInstance().getMemberById(uid);
 		if(member != null){
 			new AlertDialog.Builder(context)
-					.setTitle(R.string.app_name)
-					.setView(et)
-					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialogInterface, int i) {
-							String msg = et.getText().toString();
-							if(!TextUtils.isEmpty(msg)){
-								FireBaseManager.getInstance().sendNotification(member.token, member.name, msg);
-							}
+				.setTitle(R.string.app_name)
+				.setView(et)
+				.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						String msg = et.getText().toString();
+						if(!TextUtils.isEmpty(msg)){
+							FireBaseManager.getInstance().sendNotification(member.token, member.name, msg);
 						}
-					})
-					.setNegativeButton("cancel", null)
-					.create().show();
+					}
+				})
+				.setNegativeButton(R.string.cancel, null)
+				.create().show();
 		}
 	}
 
@@ -81,8 +80,6 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 		}
 		messageView.sendMessageReady();
 		Message msg = new Message(user.getUid(),
-				user.getDisplayName(),
-				user.getPhotoUrl() != null? user.getPhotoUrl().toString() : "",
 				text,
 				System.currentTimeMillis());
 		FireBaseManager.getInstance().sendMessage(msg, new OnCompleteListener<Void>() {
@@ -100,16 +97,20 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 
 	@Override
 	public void start() {
+		FireBaseManager.getInstance().login(null);
 		data = new ArrayList<>();
 		messageDatabase = FirebaseDatabase.getInstance().getReference("messages");
 		messageDatabase.keepSynced(false);
 		messageView.setRefresh(true);
 		messageDatabase.addValueEventListener(messageListener);
+		MemberManager.getInstance().registerUserListener();
 	}
 
 	@Override
 	public void stop() {
 		messageDatabase.removeEventListener(messageListener);
+		MemberManager.getInstance().unRegisterUserListener();
+		FireBaseManager.getInstance().loginOut();
 	}
 
 	@Override

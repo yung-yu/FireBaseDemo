@@ -1,5 +1,6 @@
 package andy.firebasedemo.services;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -20,55 +21,57 @@ import andy.firebasedemo.R;
  */
 
 public class PushFireBaseSerivce extends FirebaseMessagingService {
-    private static final String TAG = "PushFireBaseSerivce";
+	private static final String TAG = "PushFireBaseSerivce";
 
-    @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+	@Override
+	public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: " + remoteMessage.getMessageType());
+		// TODO(developer): Handle FCM messages here.
+		// Not getting messages here? See why this may be: https://goo.gl/39bRNJ
+		Log.d(TAG, "From: " + remoteMessage.getMessageType());
 
-        // Check if message contains a data payload.
-        if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-        }
+		// Check if message contains a data payload.
+		if (remoteMessage.getData().size() > 0) {
+			Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+		}
 
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
-        }
+		// Check if message contains a notification payload.
+		if (remoteMessage.getNotification() != null) {
+			Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+			sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
+		}
 
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
-    }
-    // [END receive_message]
+		// Also if you intend on generating your own notifications as a result of a received FCM
+		// message, here is where that should be initiated. See sendNotification method below.
+	}
+	// [END receive_message]
 
-    /**
-     * Create and show a simple notification containing the received FCM message.
-     *
-     * @param messageBody FCM message body received.
-     */
-    private void sendNotification(String title, String messageBody) {
-        Intent intent = new Intent(this, MapsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+	/**
+	 * Create and show a simple notification containing the received FCM message.
+	 *
+	 * @param messageBody FCM message body received.
+	 */
+	private void sendNotification(String title, String messageBody) {
+		Intent intent = new Intent(this, MapsActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+				PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.messageing)
-                .setContentTitle(title)
-                .setContentText(messageBody)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setFullScreenIntent(pendingIntent, true);
+		int defaults = Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS;
 
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+				.setDefaults(defaults)
+				.setSmallIcon(R.mipmap.messageing)
+				.setContentTitle(title)
+				.setContentText(messageBody)
+				.setAutoCancel(true)
+				.setContentIntent(pendingIntent);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-    }
+		NotificationManager notificationManager =
+				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		notificationManager.notify(9999, notificationBuilder.build());
+
+	}
 
 }
