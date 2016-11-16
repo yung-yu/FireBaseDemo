@@ -113,38 +113,40 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 
 		if(message != null){
 			Member member = MemberManager.getInstance().getMemberById(message.fromId);
-			if(isMe(message.fromId)){
-				vh.leftHeader.setVisibility(View.GONE);
-				vh.rightHeader.setVisibility(View.VISIBLE);
-				vh.leftText.setVisibility(View.GONE);
-				vh.leftTextContent.setVisibility(View.GONE);
-				vh.rightText.setVisibility(View.VISIBLE);
-				vh.rightTextContent.setVisibility(View.VISIBLE);
-				vh.rightText.setText(member.name + "說:\n" + message.msg);
-				vh.rightHeader.setTag(member.icon);
-				vh.leftHeader.setTag(null);
-				Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
-				if(bitmap != null && !bitmap.isRecycled()) {
-					vh.rightHeader.setImageBitmap(bitmap);
-				}else{
-					imageLoader.displayImage(member.icon, vh.rightHeader, getDisplayImageOptions());
-				}
+			if(member != null) {
+				if (isMe(message.fromId)) {
+					vh.leftHeader.setVisibility(View.GONE);
+					vh.rightHeader.setVisibility(View.VISIBLE);
+					vh.leftText.setVisibility(View.GONE);
+					vh.leftTextContent.setVisibility(View.GONE);
+					vh.rightText.setVisibility(View.VISIBLE);
+					vh.rightTextContent.setVisibility(View.VISIBLE);
+					vh.rightText.setText(member.name + "說:\n" + message.msg);
+					vh.rightHeader.setTag(member.icon);
+					vh.leftHeader.setTag(null);
+					Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
+					if (bitmap != null && !bitmap.isRecycled()) {
+						vh.rightHeader.setImageBitmap(bitmap);
+					} else {
+						imageLoader.displayImage(member.icon, vh.rightHeader, getDisplayImageOptions());
+					}
 
-			}else {
-				vh.leftHeader.setVisibility(View.VISIBLE);
-				vh.rightHeader.setVisibility(View.GONE);
-				vh.rightHeader.setTag(null);
-				vh.leftHeader.setTag(member.icon);
-				vh.leftText.setVisibility(View.VISIBLE);
-				vh.leftTextContent.setVisibility(View.VISIBLE);
-				vh.rightText.setVisibility(View.GONE);
-				vh.rightTextContent.setVisibility(View.GONE);
-				vh.leftText.setText(member.name + "說:\n" + message.msg);
-				Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
-				if(bitmap != null && !bitmap.isRecycled()) {
-					vh.leftHeader.setImageBitmap(bitmap);
-				}else{
-					imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
+				} else {
+					vh.leftHeader.setVisibility(View.VISIBLE);
+					vh.rightHeader.setVisibility(View.GONE);
+					vh.rightHeader.setTag(null);
+					vh.leftHeader.setTag(member.icon);
+					vh.leftText.setVisibility(View.VISIBLE);
+					vh.leftTextContent.setVisibility(View.VISIBLE);
+					vh.rightText.setVisibility(View.GONE);
+					vh.rightTextContent.setVisibility(View.GONE);
+					vh.leftText.setText(member.name + "說:\n" + message.msg);
+					Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
+					if (bitmap != null && !bitmap.isRecycled()) {
+						vh.leftHeader.setImageBitmap(bitmap);
+					} else {
+						imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
+					}
 				}
 			}
 

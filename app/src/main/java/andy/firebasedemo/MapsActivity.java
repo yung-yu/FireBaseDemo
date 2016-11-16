@@ -168,7 +168,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(final Marker marker) {
-                mMessagePresenterImp.sendNotifcationMessage((String) marker.getTag());
                 return false;
             }
         });

@@ -31,8 +31,6 @@ public interface MessageContract {
 	}
 
 	interface Presenter extends BasePresenter {
-		void sendNotifcationMessage(String uid);
-
 		void sendMessage(String message);
 	}
 }

@@ -2,10 +2,13 @@ package andy.firebasedemo;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +20,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -25,8 +30,10 @@ import java.util.List;
 import andy.firebasedemo.adapter.ChatRoomMessageAdapter;
 import andy.firebasedemo.login.LoginDialogFragment;
 import andy.firebasedemo.manager.FireBaseManager;
+import andy.firebasedemo.manager.MemberManager;
 import andy.firebasedemo.message.MessageContract;
 import andy.firebasedemo.message.MessagePresenterImp;
+import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
 
 /**
@@ -160,6 +167,8 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 		loginOut.setVisible(FirebaseAuth.getInstance().getCurrentUser() != null);
 		MenuItem loginIn = menu.findItem(R.id.loginIn);
 		loginIn.setVisible(FirebaseAuth.getInstance().getCurrentUser() == null);
+		MenuItem changeName = menu.findItem(R.id.changeName);
+		changeName.setVisible(FirebaseAuth.getInstance().getCurrentUser() != null);
 		return true;
 	}
 
@@ -184,6 +193,9 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 		   case R.id.loginIn:
 			   showLoginDialog();
 			   break;
+		   case R.id.changeName:
+			   showChangeNameDialog();
+			   break;
 	   }
 		return true;
 	}
@@ -205,4 +217,45 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 					LoginDialogFragment.class.getName());
 		}
 	}
+
+	private void showChangeNameDialog(){
+		FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+		if(user != null){
+			final Member member = MemberManager.getInstance().getMemberById(user.getUid());
+			final EditText et = new EditText(this);
+			et.setText(member.name);
+			et.setGravity(Gravity.CENTER);
+			et.setMaxLines(1);
+			new AlertDialog.Builder(this)
+					.setTitle(R.string.app_name)
+					.setMessage(R.string.change_name)
+					.setView(et)
+					.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialogInterface, int i) {
+							String newName = et.getText().toString();
+                            if(!TextUtils.isEmpty(newName) &&
+									!newName.equals(member.name)){
+                                FireBaseManager.getInstance().updateMemberName(newName, new OnCompleteListener() {
+									@Override
+									public void onComplete(@NonNull Task task) {
+										if(task.isSuccessful()){
+											Toast.makeText(ChatRoomActivity.this, R.string.update_success, Toast.LENGTH_SHORT).show();
+											mMsgAdapter.notifyDataSetChanged();
+										}else{
+											Toast.makeText(ChatRoomActivity.this, R.string.update_failed, Toast.LENGTH_SHORT).show();
+										}
+									}
+								});
+
+							}
+						}
+					})
+					.setNegativeButton(R.string.cancel, null)
+					.create().show();
+		}
+
+	}
 }
+
+

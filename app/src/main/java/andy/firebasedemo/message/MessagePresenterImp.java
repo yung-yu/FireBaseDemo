@@ -38,33 +38,11 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 	private MessageContract.View messageView;
 	private Context context;
 	private DatabaseReference messageDatabase;
-	private List< Message> data ;
+	private List< Message> data;
 
 	public MessagePresenterImp(Context context, MessageContract.View messageView) {
 		this.messageView = messageView;
 		this.context = context;
-	}
-
-	@Override
-	public void sendNotifcationMessage(String uid) {
-		final EditText et = new EditText(context);
-		final Member member = MemberManager.getInstance().getMemberById(uid);
-		if(member != null){
-			new AlertDialog.Builder(context)
-				.setTitle(R.string.app_name)
-				.setView(et)
-				.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialogInterface, int i) {
-						String msg = et.getText().toString();
-						if(!TextUtils.isEmpty(msg)){
-							FireBaseManager.getInstance().sendNotification(member.token, member.name, msg);
-						}
-					}
-				})
-				.setNegativeButton(R.string.cancel, null)
-				.create().show();
-		}
 	}
 
 	@Override
@@ -102,7 +80,7 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 		messageDatabase = FirebaseDatabase.getInstance().getReference("messages");
 		messageDatabase.keepSynced(false);
 		messageView.setRefresh(true);
-		messageDatabase.addValueEventListener(messageListener);
+		messageDatabase.limitToLast(100).addValueEventListener(messageListener);
 		MemberManager.getInstance().registerUserListener();
 	}
 

@@ -1,4 +1,4 @@
-package andy.firebasedemo;
+package andy.firebasedemo.map;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

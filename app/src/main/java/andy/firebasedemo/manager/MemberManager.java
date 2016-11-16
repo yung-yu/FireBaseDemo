@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.object.Member;
 
 /**
@@ -27,11 +28,11 @@ public class MemberManager implements ChildEventListener {
 		return instance;
 	}
 	public void registerUserListener() {
-		FirebaseDatabase.getInstance().getReference("users").addChildEventListener(this);
+		FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS).addChildEventListener(this);
 	}
 
 	public void unRegisterUserListener() {
-		FirebaseDatabase.getInstance().getReference("users").removeEventListener(this);
+		FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS).removeEventListener(this);
 	}
 
     public void remove(String uid){
@@ -46,7 +47,7 @@ public class MemberManager implements ChildEventListener {
 		}
 	}
 
-	public List<Member> getOffLineMember(){
+	public List<Member> getOffLineMembers(){
 		List<Member> members = new ArrayList<>();
 		for(HashMap.Entry<String, Member> entry :memberCache.entrySet()){
 			if(entry != null){
@@ -58,7 +59,16 @@ public class MemberManager implements ChildEventListener {
 		}
 		return members;
 	}
-
+	public List<Member> getAllMembers(){
+		List<Member> members = new ArrayList<>();
+		for(HashMap.Entry<String, Member> entry :memberCache.entrySet()){
+			if(entry != null){
+				Member member = entry.getValue();
+				members.add(member);
+			}
+		}
+		return members;
+	}
 	public Member getMemberById(String uid){
 		return memberCache.get(uid);
 	}

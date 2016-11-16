@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
 
@@ -55,8 +57,8 @@ public class FireBaseManager {
 
 	public FireBaseManager() {
 		mAuth = FirebaseAuth.getInstance();
-		mMemberDataBase = FirebaseDatabase.getInstance().getReference("users");
-		mMessagesDataBase = FirebaseDatabase.getInstance().getReference("messages");
+		mMemberDataBase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS);
+		mMessagesDataBase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
 	}
 
 	public void login(OnCompleteListener onCompleteListener) {
@@ -77,6 +79,26 @@ public class FireBaseManager {
 			HashMap<String, Object> item = new HashMap<>();
 			item.put("status", Member.STATUS_OFFLINE);
 			mMemberDataBase.child(user.getUid()).updateChildren(item);
+		}
+	}
+
+	public void updateMemberName(final String newName, final OnCompleteListener listener ) {
+		final FirebaseUser user = mAuth.getCurrentUser();
+		if (user != null) {
+			UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+					.setDisplayName(newName)
+					.build();
+			user.updateProfile(request).addOnCompleteListener(new OnCompleteListener<Void>() {
+				@Override
+				public void onComplete(@NonNull Task<Void> task) {
+					if(task.isSuccessful()) {
+						HashMap<String, Object> item = new HashMap<>();
+						item.put("name", newName);
+						mMemberDataBase.child(user.getUid()).updateChildren(item).addOnCompleteListener(listener);
+					}
+				}
+			});
+
 		}
 	}
 
@@ -114,11 +136,11 @@ public class FireBaseManager {
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
 		mMessagesDataBase.push().setValue(item).addOnCompleteListener(listener);
-		List<Member> offlineMembers = MemberManager.getInstance().getOffLineMember();
-		Member myMember = MemberManager.getInstance().getMemberById(item.fromId);
+		List<Member> offlineMembers = MemberManager.getInstance().getOffLineMembers();
+		Member sender = MemberManager.getInstance().getMemberById(item.fromId);
 		if(offlineMembers.size() > 0){
 			for(Member member : offlineMembers){
-				sendNotification(member.token, myMember.name, item.msg);
+				sendNotification(member.token, sender.name, item.msg);
 			}
 		}
 
@@ -136,13 +158,15 @@ public class FireBaseManager {
 		return myMember;
 	}
 
-	public void sendNotification(final String token, final String sender, final String msg) {
+	public void sendNotification(final String token , final String sender, final String msg) {
 		new Thread("SendFCM"){
 			@Override
 			public void run() {
 				try {
 					String jsonMessage = "{\"notification\":{\n" +
 							"\"title\":\"" + sender + "\"," +
+							"\"sound\":\"" + "default" + "\"," +
+							"\"tag\":\"" + 999 + "\"," +
 							"\"body\": \"" + msg + "\"\n" +
 							"  },\n" +
 							"  \"to\" : \"" + token + "\"" +

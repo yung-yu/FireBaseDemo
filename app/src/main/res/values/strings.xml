@@ -16,4 +16,6 @@
     <string name="ok">OK</string>
     <string name="cancel">cancel</string>
     <string name="login_success">Login success</string>
+    <string name="update_success">Update success</string>
+    <string name="update_failed">Update failed</string>
 </resources>

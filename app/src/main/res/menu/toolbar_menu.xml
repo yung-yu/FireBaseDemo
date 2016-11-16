@@ -10,4 +10,8 @@
         android:id="@+id/loginIn"
         android:title="@string/login"
         />
+    <item
+        android:id="@+id/changeName"
+        android:title="@string/change_name"
+        />
 </menu>
