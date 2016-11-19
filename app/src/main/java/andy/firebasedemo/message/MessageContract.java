@@ -27,7 +27,11 @@ public interface MessageContract {
 
 		void onNotify(List<Message> data);
 
-		void setRefresh(boolean isRefresh);
+		void onNotify();
+
+		void setRefresh(boolean isRefresh, String progressMsg);
+
+		void onLoginFailed();
 	}
 
 	interface Presenter extends BasePresenter {

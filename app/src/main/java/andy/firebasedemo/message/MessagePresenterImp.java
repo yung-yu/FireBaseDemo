@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import andy.firebasedemo.R;
+import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.manager.MemberManager;
 import andy.firebasedemo.object.Member;
@@ -33,7 +34,7 @@ import andy.firebasedemo.object.Message;
  * Created by andyli on 2016/11/5.
  */
 
-public class MessagePresenterImp implements MessageContract.Presenter{
+public class MessagePresenterImp implements MessageContract.Presenter, MemberManager.OnMemberChangeListener{
 
 	private MessageContract.View messageView;
 	private Context context;
@@ -75,13 +76,23 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 
 	@Override
 	public void start() {
-		FireBaseManager.getInstance().login(null);
-		data = new ArrayList<>();
-		messageDatabase = FirebaseDatabase.getInstance().getReference("messages");
-		messageDatabase.keepSynced(false);
-		messageView.setRefresh(true);
-		messageDatabase.limitToLast(100).addValueEventListener(messageListener);
-		MemberManager.getInstance().registerUserListener();
+		messageView.setRefresh(true,context.getString(R.string.logining));
+		FireBaseManager.getInstance().login(new OnCompleteListener() {
+			@Override
+			public void onComplete(@NonNull Task task) {
+				if(task.isSuccessful()) {
+					messageView.setRefresh(true, context.getString(R.string.loadDataing));
+					data = new ArrayList<>();
+					messageDatabase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
+					messageDatabase.limitToLast(100).addValueEventListener(messageListener);
+					MemberManager.getInstance().registerUserListener(MessagePresenterImp.this);
+				} else {
+					messageView.setRefresh(false,"");
+					messageView.onLoginFailed();
+				}
+			}
+		});
+
 	}
 
 	@Override
@@ -99,7 +110,7 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 	private ValueEventListener messageListener = new ValueEventListener() {
 		@Override
 		public void onDataChange(DataSnapshot dataSnapshot) {
-			messageView.setRefresh(true);
+			messageView.setRefresh(true, context.getString(R.string.messsge_updateing));
 			data.clear();
 			if(dataSnapshot.getChildrenCount() > 0) {
 				for (DataSnapshot item: dataSnapshot.getChildren()) {
@@ -109,7 +120,7 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 				}
 			}
 			messageView.onNotify(data);
-			messageView.setRefresh(false);
+			messageView.setRefresh(false, "");
 		}
 
 		@Override
@@ -119,5 +130,8 @@ public class MessagePresenterImp implements MessageContract.Presenter{
 	};
 
 
-
+	@Override
+	public void OnMemberChange() {
+		messageView.onNotify();
+	}
 }

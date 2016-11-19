@@ -16,4 +16,7 @@
     <string name="cancel">取消</string>
     <string name="login_success">登入成功</string>
     <string name="update_success">更新成功</string>
+    <string name="loginOutSuccess">登出成功</string>
+    <string name="loadDataing">載入資料中..</string>
+    <string name="messsge_updateing">訊息更新中...</string>
 </resources>

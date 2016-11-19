@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,6 +35,8 @@ import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +46,7 @@ import andy.firebasedemo.R;
 import andy.firebasedemo.manager.MemberManager;
 import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
+import andy.firebasedemo.util.TimeUtils;
 
 
 /**
@@ -84,10 +88,12 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
     class ViewHolder{
 		ImageView leftHeader;
 		ImageView rightHeader;
-		CardView leftTextContent;
-		CardView rightTextContent;
+		LinearLayout leftTextContent;
+		LinearLayout rightTextContent;
 		TextView leftText;
 		TextView rightText;
+		TextView leftTime;
+		TextView rightTime;
 	}
 	private boolean isMe(String uid){
 		return  FirebaseAuth.getInstance().getCurrentUser() != null
@@ -102,9 +108,11 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 			vh.leftHeader = (ImageView) view.findViewById(R.id.left_header);
 			vh.rightHeader =  (ImageView) view.findViewById(R.id.right_header);
 			vh.leftText = (TextView) view.findViewById(R.id.leftText);
-			vh.leftTextContent = (CardView) view.findViewById(R.id.leftTextContent);
+			vh.leftTextContent = (LinearLayout) view.findViewById(R.id.leftTextContent);
 			vh.rightText = (TextView) view.findViewById(R.id.rightText);
-			vh.rightTextContent = (CardView) view.findViewById(R.id.rightTextContent);
+			vh.rightTextContent = (LinearLayout) view.findViewById(R.id.rightTextContent);
+			vh.leftTime = (TextView) view.findViewById(R.id.leftTime);
+			vh.rightTime = (TextView) view.findViewById(R.id.rightTime);
 			view.setTag(vh);
 		}else{
 			vh = (ViewHolder) view.getTag();
@@ -115,12 +123,9 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 			Member member = MemberManager.getInstance().getMemberById(message.fromId);
 			if(member != null) {
 				if (isMe(message.fromId)) {
-					vh.leftHeader.setVisibility(View.GONE);
-					vh.rightHeader.setVisibility(View.VISIBLE);
-					vh.leftText.setVisibility(View.GONE);
 					vh.leftTextContent.setVisibility(View.GONE);
-					vh.rightText.setVisibility(View.VISIBLE);
 					vh.rightTextContent.setVisibility(View.VISIBLE);
+					vh.rightTime.setText(TimeUtils.getTimeFormatStr(message.time));
 					vh.rightText.setText(member.name + "說:\n" + message.msg);
 					vh.rightHeader.setTag(member.icon);
 					vh.leftHeader.setTag(null);
@@ -132,14 +137,11 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 					}
 
 				} else {
-					vh.leftHeader.setVisibility(View.VISIBLE);
-					vh.rightHeader.setVisibility(View.GONE);
-					vh.rightHeader.setTag(null);
-					vh.leftHeader.setTag(member.icon);
-					vh.leftText.setVisibility(View.VISIBLE);
 					vh.leftTextContent.setVisibility(View.VISIBLE);
-					vh.rightText.setVisibility(View.GONE);
 					vh.rightTextContent.setVisibility(View.GONE);
+					vh.leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
+					vh.leftHeader.setTag(member.icon);
+					vh.rightText.setText(null);
 					vh.leftText.setText(member.name + "說:\n" + message.msg);
 					Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
 					if (bitmap != null && !bitmap.isRecycled()) {
@@ -148,6 +150,14 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 						imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
 					}
 				}
+			}else{
+				vh.leftTextContent.setVisibility(View.VISIBLE);
+				vh.rightTextContent.setVisibility(View.GONE);
+				vh.rightHeader.setTag(null);
+				vh.leftHeader.setTag(null);
+				vh.leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
+				vh.leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
+				vh.leftText.setText("某人說:\n" + message.msg);
 			}
 
 		}

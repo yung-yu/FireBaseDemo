@@ -19,6 +19,7 @@ import andy.firebasedemo.object.Member;
 public class MemberManager implements ChildEventListener {
 	static  MemberManager instance;
 	private HashMap<String, Member> memberCache = new HashMap<>();
+	private OnMemberChangeListener listener;
 
 
 	public static MemberManager getInstance(){
@@ -27,12 +28,19 @@ public class MemberManager implements ChildEventListener {
 		}
 		return instance;
 	}
-	public void registerUserListener() {
+
+	public interface OnMemberChangeListener{
+		  void OnMemberChange();
+	}
+
+	public void registerUserListener(OnMemberChangeListener OnMemberChangeListener) {
+		this.listener = OnMemberChangeListener;
 		FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS).addChildEventListener(this);
 	}
 
 	public void unRegisterUserListener() {
 		FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS).removeEventListener(this);
+		this.listener = null;
 	}
 
     public void remove(String uid){
@@ -84,17 +92,26 @@ public class MemberManager implements ChildEventListener {
 	public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 		Member member = dataSnapshot.getValue(Member.class);
 		updateMember(dataSnapshot.getKey(), member);
+		if(listener != null){
+			listener.OnMemberChange();
+		}
 	}
 
 	@Override
 	public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 		Member member = dataSnapshot.getValue(Member.class);
 		updateMember(dataSnapshot.getKey(), member);
+		if(listener != null) {
+			listener.OnMemberChange();
+		}
 	}
 
 	@Override
 	public void onChildRemoved(DataSnapshot dataSnapshot) {
 		remove(dataSnapshot.getKey());
+		if(listener != null) {
+			listener.OnMemberChange();
+		}
 	}
 
 	@Override

@@ -221,7 +221,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void setRefresh(boolean isRefresh) {
+    public void onNotify() {
+
+    }
+
+    @Override
+    public void setRefresh(boolean isRefresh, String progressMsg) {
+
+    }
+
+    @Override
+    public void onLoginFailed() {
 
     }
 

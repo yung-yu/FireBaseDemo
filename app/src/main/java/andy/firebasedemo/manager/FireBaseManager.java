@@ -1,10 +1,14 @@
 package andy.firebasedemo.manager;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,6 +29,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.object.Member;
@@ -70,6 +75,70 @@ public class FireBaseManager {
 					System.currentTimeMillis(), FirebaseInstanceId.getInstance().getToken(), Member.STATUS_ONLINE);
 			mMemberDataBase.child(user.getUid()).updateChildren(myMember.toMap()).addOnCompleteListener(onCompleteListener);
 			requestFBUserId();
+		}else{
+			onCompleteListener.onComplete(new Task() {
+				@Override
+				public boolean isComplete() {
+					return false;
+				}
+
+				@Override
+				public boolean isSuccessful() {
+					return false;
+				}
+
+				@Override
+				public Object getResult() {
+					return null;
+				}
+
+				@Nullable
+				@Override
+				public Exception getException() {
+					return null;
+				}
+
+				@NonNull
+				@Override
+				public Task addOnSuccessListener(@NonNull OnSuccessListener onSuccessListener) {
+					return null;
+				}
+
+				@NonNull
+				@Override
+				public Task addOnSuccessListener(@NonNull Executor executor, @NonNull OnSuccessListener onSuccessListener) {
+					return null;
+				}
+
+				@NonNull
+				@Override
+				public Task addOnSuccessListener(@NonNull Activity activity, @NonNull OnSuccessListener onSuccessListener) {
+					return null;
+				}
+
+				@NonNull
+				@Override
+				public Task addOnFailureListener(@NonNull OnFailureListener onFailureListener) {
+					return null;
+				}
+
+				@NonNull
+				@Override
+				public Task addOnFailureListener(@NonNull Executor executor, @NonNull OnFailureListener onFailureListener) {
+					return null;
+				}
+
+				@NonNull
+				@Override
+				public Task addOnFailureListener(@NonNull Activity activity, @NonNull OnFailureListener onFailureListener) {
+					return null;
+				}
+
+				@Override
+				public Object getResult(@NonNull Class aClass) throws Throwable {
+					return null;
+				}
+			});
 		}
 	}
 
@@ -100,6 +169,10 @@ public class FireBaseManager {
 			});
 
 		}
+	}
+
+	public void deleteMember(String uid) {
+		mMemberDataBase.child(uid).removeValue();
 	}
 
 	public void requestFBUserId() {

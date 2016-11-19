@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
@@ -48,6 +49,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 	private Toolbar mToolbar;
 	private LoginDialogFragment mLoginDialogFragment;
 	private ProgressBar toolbarProgressBar;
+	private TextView toolbar_text;
 
 
 	@Override
@@ -60,6 +62,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 		listView = (ListView) findViewById(R.id.listview);
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		toolbarProgressBar = (ProgressBar) findViewById(R.id.toolbar_progress_bar);
+		toolbar_text = (TextView) findViewById(R.id.toolbar_text);
 		setSupportActionBar(mToolbar);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -99,9 +102,6 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 	protected void onStart() {
 		super.onStart();
 		mMessagePresenterImp.start();
-		if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-			showLoginDialog();
-		}
 	}
 
 	@Override
@@ -151,8 +151,20 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 	}
 
 	@Override
-	public void setRefresh(boolean isRefresh) {
+	public void onNotify() {
+		mMsgAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void setRefresh(boolean isRefresh, String progressMsg) {
 		toolbarProgressBar.setVisibility(isRefresh?View.VISIBLE:View.GONE);
+		toolbar_text.setVisibility(isRefresh?View.VISIBLE:View.GONE);
+		toolbar_text.setText(progressMsg);
+	}
+
+	@Override
+	public void onLoginFailed() {
+		showLoginDialog();
 	}
 
 	@Override
@@ -182,10 +194,12 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 				   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 					   @Override
 					   public void onClick(DialogInterface dialogInterface, int i) {
-						   FirebaseAuth.getInstance().getCurrentUser().delete();
-						   FirebaseAuth.getInstance().signOut();
-						   mMsgAdapter.notifyDataSetChanged();
-						   Toast.makeText(ChatRoomActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
+						   FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+						   if(user != null) {
+							   FirebaseAuth.getInstance().signOut();
+							   mMsgAdapter.notifyDataSetChanged();
+							   Toast.makeText(ChatRoomActivity.this, R.string.loginOutSuccess, Toast.LENGTH_SHORT).show();
+						   }
 					   }
 				   }).setNegativeButton(R.string.cancel, null)
 				   .create().show();
@@ -208,7 +222,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 			mLoginDialogFragment.setOnLoginSuccessListener(new LoginDialogFragment.OnLoginSuccessListener() {
 				@Override
 				public void onLogin() {
-					mMsgAdapter.notifyDataSetChanged();
+					mMessagePresenterImp.start();
 				}
 			});
 		}
