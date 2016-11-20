@@ -171,9 +171,6 @@ public class FireBaseManager {
 		}
 	}
 
-	public void deleteMember(String uid) {
-		mMemberDataBase.child(uid).removeValue();
-	}
 
 	public void requestFBUserId() {
 
@@ -209,27 +206,13 @@ public class FireBaseManager {
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
 		mMessagesDataBase.push().setValue(item).addOnCompleteListener(listener);
-		List<Member> offlineMembers = MemberManager.getInstance().getOffLineMembers();
-		Member sender = MemberManager.getInstance().getMemberById(item.fromId);
-		if(offlineMembers.size() > 0){
-			for(Member member : offlineMembers){
-				sendNotification(member.token, sender.name, item.msg);
-			}
-		}
-
 	}
 
-	public void updateMessage(String msgID, String changeText) {
-		HashMap<String, Object> item = new HashMap<>();
-		item.put("msg", changeText);
-		mMessagesDataBase.child(msgID).updateChildren(item);
-	}
+
 	public void deleteMessage(String msgID) {
 		mMessagesDataBase.child(msgID).removeValue();
 	}
-	public Member getMyMember() {
-		return myMember;
-	}
+
 
 	public void sendNotification(final String token , final String sender, final String msg) {
 		new Thread("SendFCM"){
