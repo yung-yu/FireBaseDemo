@@ -199,6 +199,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 							   FirebaseAuth.getInstance().signOut();
 							   mMsgAdapter.notifyDataSetChanged();
 							   Toast.makeText(ChatRoomActivity.this, R.string.loginOutSuccess, Toast.LENGTH_SHORT).show();
+							   mMessagePresenterImp.stop();
 						   }
 					   }
 				   }).setNegativeButton(R.string.cancel, null)

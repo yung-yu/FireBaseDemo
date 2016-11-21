@@ -12,7 +12,7 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Message {
     public String fromId;
-    public String msg;
+    public String text;
     public long time;
     public String id;
 
@@ -20,9 +20,9 @@ public class Message {
 
     }
 
-    public Message(String fromId, String msg, long time) {
+    public Message(String fromId, String text, long time) {
         this.fromId = fromId;
-        this.msg = msg;
+        this.text = text;
         this.time = time;
     }
 
@@ -30,7 +30,7 @@ public class Message {
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("fromId", fromId);
-        result.put("msg", msg);
+        result.put("text", text);
         result.put("time", time);
         return result;
     }

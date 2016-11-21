@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.MediaStore;
 import android.support.v7.widget.CardView;
+import android.text.TextUtils;
 import android.util.LruCache;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -119,21 +120,25 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 		}
 		Message message = getItem(i);
 
-		if(message != null){
+		if(message != null) {
 			Member member = MemberManager.getInstance().getMemberById(message.fromId);
-			if(member != null) {
+			if (member != null) {
 				if (isMe(message.fromId)) {
 					vh.leftTextContent.setVisibility(View.GONE);
 					vh.rightTextContent.setVisibility(View.VISIBLE);
 					vh.rightTime.setText(TimeUtils.getTimeFormatStr(message.time));
-					vh.rightText.setText(member.name + "說:\n" + message.msg);
+					vh.rightText.setText(member.name + "說:\n" + message.text);
 					vh.rightHeader.setTag(member.icon);
 					vh.leftHeader.setTag(null);
-					Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
-					if (bitmap != null && !bitmap.isRecycled()) {
-						vh.rightHeader.setImageBitmap(bitmap);
+					if (!TextUtils.isEmpty(member.icon)) {
+						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
+						if (bitmap != null && !bitmap.isRecycled()) {
+							vh.rightHeader.setImageBitmap(bitmap);
+						} else {
+							imageLoader.displayImage(member.icon, vh.rightHeader, getDisplayImageOptions());
+						}
 					} else {
-						imageLoader.displayImage(member.icon, vh.rightHeader, getDisplayImageOptions());
+						vh.rightHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
 					}
 
 				} else {
@@ -142,22 +147,26 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 					vh.leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
 					vh.leftHeader.setTag(member.icon);
 					vh.rightText.setText(null);
-					vh.leftText.setText(member.name + "說:\n" + message.msg);
-					Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
-					if (bitmap != null && !bitmap.isRecycled()) {
-						vh.leftHeader.setImageBitmap(bitmap);
+					vh.leftText.setText(member.name + "說:\n" + message.text);
+					if (!TextUtils.isEmpty(member.icon)) {
+						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
+						if (bitmap != null && !bitmap.isRecycled()) {
+							vh.leftHeader.setImageBitmap(bitmap);
+						} else {
+							imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
+						}
 					} else {
-						imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
+						vh.leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
 					}
 				}
-			}else{
+			} else {
 				vh.leftTextContent.setVisibility(View.VISIBLE);
 				vh.rightTextContent.setVisibility(View.GONE);
 				vh.rightHeader.setTag(null);
 				vh.leftHeader.setTag(null);
 				vh.leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
 				vh.leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
-				vh.leftText.setText("某人說:\n" + message.msg);
+				vh.leftText.setText("某人說:\n" + message.text);
 			}
 
 		}

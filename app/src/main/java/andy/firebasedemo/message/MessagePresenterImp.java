@@ -97,7 +97,9 @@ public class MessagePresenterImp implements MessageContract.Presenter, MemberMan
 
 	@Override
 	public void stop() {
-		messageDatabase.removeEventListener(messageListener);
+		if(messageDatabase!= null) {
+			messageDatabase.removeEventListener(messageListener);
+		}
 		MemberManager.getInstance().unRegisterUserListener();
 		FireBaseManager.getInstance().loginOut();
 	}

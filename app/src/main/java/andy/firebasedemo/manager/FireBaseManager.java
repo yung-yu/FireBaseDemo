@@ -28,10 +28,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executor;
 
 import andy.firebasedemo.main.SystemＣonstants;
+import andy.firebasedemo.object.LoginFailedTask;
 import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
 
@@ -62,83 +64,27 @@ public class FireBaseManager {
 
 	public FireBaseManager() {
 		mAuth = FirebaseAuth.getInstance();
+		FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 		mMemberDataBase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS);
 		mMessagesDataBase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
 	}
 
-	public void login(OnCompleteListener onCompleteListener) {
+	public void login(OnCompleteListener listener) {
 		FirebaseUser user = mAuth.getCurrentUser();
 		if (user != null) {
 			Log.d(TAG, user.getProviderId());
 			myMember = new Member(user.getDisplayName(),
 					user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "",
 					System.currentTimeMillis(), FirebaseInstanceId.getInstance().getToken(), Member.STATUS_ONLINE);
-			mMemberDataBase.child(user.getUid()).updateChildren(myMember.toMap()).addOnCompleteListener(onCompleteListener);
+			mMemberDataBase.child(user.getUid()).updateChildren(myMember.toMap()).addOnCompleteListener(listener);
+			HashMap<String,Object> item = new HashMap<>();
+			item.put("status", Member.STATUS_OFFLINE);
+			mMemberDataBase.child(user.getUid()).onDisconnect().updateChildren(item);
 			requestFBUserId();
 		}else{
-			onCompleteListener.onComplete(new Task() {
-				@Override
-				public boolean isComplete() {
-					return false;
-				}
-
-				@Override
-				public boolean isSuccessful() {
-					return false;
-				}
-
-				@Override
-				public Object getResult() {
-					return null;
-				}
-
-				@Nullable
-				@Override
-				public Exception getException() {
-					return null;
-				}
-
-				@NonNull
-				@Override
-				public Task addOnSuccessListener(@NonNull OnSuccessListener onSuccessListener) {
-					return null;
-				}
-
-				@NonNull
-				@Override
-				public Task addOnSuccessListener(@NonNull Executor executor, @NonNull OnSuccessListener onSuccessListener) {
-					return null;
-				}
-
-				@NonNull
-				@Override
-				public Task addOnSuccessListener(@NonNull Activity activity, @NonNull OnSuccessListener onSuccessListener) {
-					return null;
-				}
-
-				@NonNull
-				@Override
-				public Task addOnFailureListener(@NonNull OnFailureListener onFailureListener) {
-					return null;
-				}
-
-				@NonNull
-				@Override
-				public Task addOnFailureListener(@NonNull Executor executor, @NonNull OnFailureListener onFailureListener) {
-					return null;
-				}
-
-				@NonNull
-				@Override
-				public Task addOnFailureListener(@NonNull Activity activity, @NonNull OnFailureListener onFailureListener) {
-					return null;
-				}
-
-				@Override
-				public Object getResult(@NonNull Class aClass) throws Throwable {
-					return null;
-				}
-			});
+			if(listener != null) {
+				listener.onComplete(new LoginFailedTask());
+			}
 		}
 	}
 
@@ -174,34 +120,34 @@ public class FireBaseManager {
 
 	public void requestFBUserId() {
 
-		FirebaseUser user = mAuth.getCurrentUser();
-		if (user != null) {
-			user.getToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-				@Override
-				public void onComplete(@NonNull final Task<GetTokenResult> task) {
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-							OkHttpClient client = new OkHttpClient();
-							Request request = new Request.Builder()
-									.url("https://graph.facebook.com/me?fields=id&access_token=" + task.getResult().getToken().trim())
-									.build();
-
-							try {
-								Response response = client.newCall(request).execute();
-								JSONObject json = new JSONObject(response.body().string());
-								Log.d(TAG, json.toString());
-							} catch (IOException e) {
-								e.printStackTrace();
-							} catch (JSONException e) {
-								e.printStackTrace();
-							}
-						}
-					}).start();
-
-				}
-			});
-		}
+//		FirebaseUser user = mAuth.getCurrentUser();
+//		if (user != null) {
+//			user.getToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+//				@Override
+//				public void onComplete(@NonNull final Task<GetTokenResult> task) {
+//					new Thread(new Runnable() {
+//						@Override
+//						public void run() {
+//							OkHttpClient client = new OkHttpClient();
+//							Request request = new Request.Builder()
+//									.url("https://graph.facebook.com/me?fields=id&access_token=" + task.getResult().getToken().trim())
+//									.build();
+//
+//							try {
+//								Response response = client.newCall(request).execute();
+//								JSONObject json = new JSONObject(response.body().string());
+//								Log.d(TAG, json.toString());
+//							} catch (IOException e) {
+//								e.printStackTrace();
+//							} catch (JSONException e) {
+//								e.printStackTrace();
+//							}
+//						}
+//					}).start();
+//
+//				}
+//			});
+//		}
 	}
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
