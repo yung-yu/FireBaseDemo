@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * Created by andyli on 2016/10/10.
+ *
  */
 @IgnoreExtraProperties
 public class Message {

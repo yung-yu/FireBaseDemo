@@ -32,19 +32,19 @@ import andy.firebasedemo.adapter.ChatRoomMessageAdapter;
 import andy.firebasedemo.login.LoginDialogFragment;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.manager.MemberManager;
-import andy.firebasedemo.message.MessageContract;
-import andy.firebasedemo.message.MessagePresenterImp;
+import andy.firebasedemo.chatroom.ChatRoomContract;
+import andy.firebasedemo.chatroom.ChatRoomPresenterImp;
 import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
 
 /**
  * Created by andyli on 2016/11/7.
  */
-public class ChatRoomActivity extends AppCompatActivity implements MessageContract.View {
+public class ChatRoomActivity extends AppCompatActivity implements ChatRoomContract.View {
 	private EditText editText;
 	private Button button;
 	private ListView listView;
-	private MessagePresenterImp mMessagePresenterImp;
+	private ChatRoomPresenterImp mMessagePresenterImp;
 	private ChatRoomMessageAdapter mMsgAdapter;
 	private Toolbar mToolbar;
 	private LoginDialogFragment mLoginDialogFragment;
@@ -95,7 +95,7 @@ public class ChatRoomActivity extends AppCompatActivity implements MessageContra
 				return true;
 			}
 		});
-		mMessagePresenterImp = new MessagePresenterImp(this, this);
+		mMessagePresenterImp = new ChatRoomPresenterImp(this, this);
 	}
 
 	@Override

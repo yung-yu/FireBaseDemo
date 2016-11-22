@@ -1,13 +1,9 @@
-package andy.firebasedemo.message;
+package andy.firebasedemo.chatroom;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,22 +23,21 @@ import andy.firebasedemo.R;
 import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.manager.MemberManager;
-import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
 
 /**
  * Created by andyli on 2016/11/5.
  */
 
-public class MessagePresenterImp implements MessageContract.Presenter, MemberManager.OnMemberChangeListener{
+public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberManager.OnMemberChangeListener{
 
-	private MessageContract.View messageView;
+	private ChatRoomContract.View chatRoomView;
 	private Context context;
 	private DatabaseReference messageDatabase;
 	private List< Message> data;
 
-	public MessagePresenterImp(Context context, MessageContract.View messageView) {
-		this.messageView = messageView;
+	public ChatRoomPresenterImp(Context context, ChatRoomContract.View chatRoomView) {
+		this.chatRoomView = chatRoomView;
 		this.context = context;
 	}
 
@@ -50,14 +45,14 @@ public class MessagePresenterImp implements MessageContract.Presenter, MemberMan
 	public  void sendMessage(String text) {
 		FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 		if(user == null){
-			messageView.sendMessageFailed(context.getString(R.string.please_login));
+			chatRoomView.sendMessageFailed(context.getString(R.string.please_login));
 			return;
 		}
 		if (TextUtils.isEmpty(text)) {
-			messageView.sendMessageFailed(context.getString(R.string.please_input_message));
+			chatRoomView.sendMessageFailed(context.getString(R.string.please_input_message));
 			return;
 		}
-		messageView.sendMessageReady();
+		chatRoomView.sendMessageReady();
 		Message msg = new Message(user.getUid(),
 				text,
 				System.currentTimeMillis());
@@ -65,9 +60,9 @@ public class MessagePresenterImp implements MessageContract.Presenter, MemberMan
 			@Override
 			public void onComplete(@NonNull Task<Void> task) {
 				if(task.isSuccessful()) {
-					messageView.sendMessageSuccess();
+					chatRoomView.sendMessageSuccess();
 				}else{
-					messageView.sendMessageFailed(task.getException().getMessage());
+					chatRoomView.sendMessageFailed(task.getException().getMessage());
 				}
 			}
 		});
@@ -76,19 +71,19 @@ public class MessagePresenterImp implements MessageContract.Presenter, MemberMan
 
 	@Override
 	public void start() {
-		messageView.setRefresh(true,context.getString(R.string.logining));
+		chatRoomView.setRefresh(true,context.getString(R.string.logining));
 		FireBaseManager.getInstance().login(new OnCompleteListener() {
 			@Override
 			public void onComplete(@NonNull Task task) {
 				if(task.isSuccessful()) {
-					messageView.setRefresh(true, context.getString(R.string.loadDataing));
+					chatRoomView.setRefresh(true, context.getString(R.string.loadDataing));
 					data = new ArrayList<>();
 					messageDatabase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
 					messageDatabase.limitToLast(100).addValueEventListener(messageListener);
-					MemberManager.getInstance().registerUserListener(MessagePresenterImp.this);
+					MemberManager.getInstance().registerUserListener(ChatRoomPresenterImp.this);
 				} else {
-					messageView.setRefresh(false,"");
-					messageView.onLoginFailed();
+					chatRoomView.setRefresh(false,"");
+					chatRoomView.onLoginFailed();
 				}
 			}
 		});
@@ -112,7 +107,7 @@ public class MessagePresenterImp implements MessageContract.Presenter, MemberMan
 	private ValueEventListener messageListener = new ValueEventListener() {
 		@Override
 		public void onDataChange(DataSnapshot dataSnapshot) {
-			messageView.setRefresh(true, context.getString(R.string.messsge_updateing));
+			chatRoomView.setRefresh(true, context.getString(R.string.messsge_updateing));
 			data.clear();
 			if(dataSnapshot.getChildrenCount() > 0) {
 				for (DataSnapshot item: dataSnapshot.getChildren()) {
@@ -121,8 +116,8 @@ public class MessagePresenterImp implements MessageContract.Presenter, MemberMan
 					data.add(msg);
 				}
 			}
-			messageView.onNotify(data);
-			messageView.setRefresh(false, "");
+			chatRoomView.onNotify(data);
+			chatRoomView.setRefresh(false, "");
 		}
 
 		@Override
@@ -134,6 +129,6 @@ public class MessagePresenterImp implements MessageContract.Presenter, MemberMan
 
 	@Override
 	public void OnMemberChange() {
-		messageView.onNotify();
+		chatRoomView.onNotify();
 	}
 }

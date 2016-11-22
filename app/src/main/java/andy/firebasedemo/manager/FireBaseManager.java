@@ -1,18 +1,12 @@
 package andy.firebasedemo.manager;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -23,14 +17,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.Executor;
 
 import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.object.LoginFailedTask;
@@ -57,16 +44,16 @@ public class FireBaseManager {
 	}
 
 	private FirebaseAuth mAuth;
-	private DatabaseReference mMemberDataBase;
-	private DatabaseReference mMessagesDataBase;
+	private DatabaseReference mMemberReference;
+	private DatabaseReference mMessagesReference;
 	private Member myMember;
 
 
 	public FireBaseManager() {
 		mAuth = FirebaseAuth.getInstance();
 		FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-		mMemberDataBase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS);
-		mMessagesDataBase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
+		mMemberReference = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS);
+		mMessagesReference = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
 	}
 
 	public void login(OnCompleteListener listener) {
@@ -76,11 +63,10 @@ public class FireBaseManager {
 			myMember = new Member(user.getDisplayName(),
 					user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "",
 					System.currentTimeMillis(), FirebaseInstanceId.getInstance().getToken(), Member.STATUS_ONLINE);
-			mMemberDataBase.child(user.getUid()).updateChildren(myMember.toMap()).addOnCompleteListener(listener);
+			mMemberReference.child(user.getUid()).updateChildren(myMember.toMap()).addOnCompleteListener(listener);
 			HashMap<String,Object> item = new HashMap<>();
 			item.put("status", Member.STATUS_OFFLINE);
-			mMemberDataBase.child(user.getUid()).onDisconnect().updateChildren(item);
-			requestFBUserId();
+			mMemberReference.child(user.getUid()).onDisconnect().updateChildren(item);
 		}else{
 			if(listener != null) {
 				listener.onComplete(new LoginFailedTask());
@@ -93,7 +79,7 @@ public class FireBaseManager {
 		if (user != null) {
 			HashMap<String, Object> item = new HashMap<>();
 			item.put("status", Member.STATUS_OFFLINE);
-			mMemberDataBase.child(user.getUid()).updateChildren(item);
+			mMemberReference.child(user.getUid()).updateChildren(item);
 		}
 	}
 
@@ -109,7 +95,7 @@ public class FireBaseManager {
 					if(task.isSuccessful()) {
 						HashMap<String, Object> item = new HashMap<>();
 						item.put("name", newName);
-						mMemberDataBase.child(user.getUid()).updateChildren(item).addOnCompleteListener(listener);
+						mMemberReference.child(user.getUid()).updateChildren(item).addOnCompleteListener(listener);
 					}
 				}
 			});
@@ -151,12 +137,12 @@ public class FireBaseManager {
 	}
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
-		mMessagesDataBase.push().setValue(item).addOnCompleteListener(listener);
+		mMessagesReference.push().setValue(item).addOnCompleteListener(listener);
 	}
 
 
 	public void deleteMessage(String msgID) {
-		mMessagesDataBase.child(msgID).removeValue();
+		mMessagesReference.child(msgID).removeValue();
 	}
 
 
@@ -202,7 +188,7 @@ public class FireBaseManager {
 	public void sendToken(String token) {
 		FirebaseUser user = mAuth.getCurrentUser();
 		if (user != null) {
-			mMemberDataBase.child(user.getUid()).child("token").setValue(token);
+			mMemberReference.child(user.getUid()).child("token").setValue(token);
 		}
 	}
 }
