@@ -158,7 +158,7 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View{
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(requestCode == GET_PHOTO_REQUEST_CODE){
+		if(requestCode == GET_PHOTO_REQUEST_CODE && data != null){
 			Uri uri = data.getData();
 			mMessagePresenterImp.sendImage(uri);
 		}

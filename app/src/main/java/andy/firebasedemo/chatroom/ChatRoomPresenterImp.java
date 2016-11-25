@@ -81,9 +81,17 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 
 	@Override
 	public void sendImage(Uri fileUri) {
-
+		final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+		if(user == null){
+			chatRoomView.sendMessageFailed(context.getString(R.string.please_login));
+			return;
+		}
+		if(fileUri == null){
+			chatRoomView.sendMessageFailed("找不到圖片");
+			return;
+		}
 		StorageReference imagesRef = FirebaseStorage.getInstance().getReference("images");
-		UploadTask uploadTask = imagesRef.child("photo").putFile(fileUri);
+		UploadTask uploadTask = imagesRef.child("photo").child("image"+user.getUid()+System.currentTimeMillis()).putFile(fileUri);
 		uploadTask.addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception exception) {
@@ -105,11 +113,7 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 				L.d(TAG, "url "+taskSnapshot.getDownloadUrl());
 				L.d(TAG, "metaData "+taskSnapshot.getMetadata().getContentType());
-				FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-				if(user == null){
-					chatRoomView.sendMessageFailed(context.getString(R.string.please_login));
-					return;
-				}
+
 
 				Message msg = new Message(user.getUid(),
 						MessageType.Photo.name(),
