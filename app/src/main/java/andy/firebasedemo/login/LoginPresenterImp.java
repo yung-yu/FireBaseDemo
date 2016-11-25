@@ -26,6 +26,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Arrays;
@@ -126,7 +127,11 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	@Override
 	public void stop() {
+		if (mGoogleApiClient != null) {
+			mGoogleApiClient.stopAutoManage((FragmentActivity) mActivity);
+			mGoogleApiClient.disconnect();
 
+		}
 	}
 
 	@Override
@@ -168,7 +173,7 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 
 	private void handleFacebookAccessToken(AccessToken token) {
 		L.d(TAG, "handleFacebookAccessToken:" + token);
-		AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+		final AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
 		FirebaseAuth.getInstance().signInWithCredential(credential)
 				.addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 					@Override
@@ -178,7 +183,11 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 							loginView.LoginSuccess(LoginType.Facebook);
 						} else {
 							L.e(TAG, "signInWithCredential" + task.getException().getMessage());
-							loginView.LoginFailed(task.getException().getMessage());
+							if(task.getException() instanceof FirebaseAuthException) {
+								FirebaseAuthException exception = (FirebaseAuthException) task.getException();
+								loginView.LoginFailed(exception.getMessage());
+							}
+
 						}
 						loginView.setProgessBarShow(false);
 

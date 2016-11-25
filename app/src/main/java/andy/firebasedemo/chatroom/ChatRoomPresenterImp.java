@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import andy.firebasedemo.Log.L;
 import andy.firebasedemo.R;
 import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.manager.FireBaseManager;
@@ -30,7 +31,7 @@ import andy.firebasedemo.object.Message;
  */
 
 public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberManager.OnMemberChangeListener{
-
+    private final static String TAG = "ChatRoomPresenterImp";
 	private ChatRoomContract.View chatRoomView;
 	private Context context;
 	private DatabaseReference messageDatabase;
@@ -71,23 +72,12 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 
 	@Override
 	public void start() {
-		chatRoomView.setRefresh(true,context.getString(R.string.logining));
-		FireBaseManager.getInstance().login(new OnCompleteListener() {
-			@Override
-			public void onComplete(@NonNull Task task) {
-				if(task.isSuccessful()) {
-					chatRoomView.setRefresh(true, context.getString(R.string.loadDataing));
-					data = new ArrayList<>();
-					messageDatabase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
-					messageDatabase.limitToLast(100).addValueEventListener(messageListener);
-					MemberManager.getInstance().registerUserListener(ChatRoomPresenterImp.this);
-				} else {
-					chatRoomView.setRefresh(false,"");
-					chatRoomView.onLoginFailed();
-				}
-			}
-		});
-
+		if(FirebaseAuth.getInstance().getCurrentUser() != null){
+			data = new ArrayList<>();
+			messageDatabase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
+			messageDatabase.limitToLast(100).addValueEventListener(messageListener);
+			MemberManager.getInstance().registerUserListener(ChatRoomPresenterImp.this);
+		}
 	}
 
 	@Override
@@ -96,7 +86,7 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 			messageDatabase.removeEventListener(messageListener);
 		}
 		MemberManager.getInstance().unRegisterUserListener();
-		FireBaseManager.getInstance().loginOut();
+
 	}
 
 	@Override
@@ -107,7 +97,6 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 	private ValueEventListener messageListener = new ValueEventListener() {
 		@Override
 		public void onDataChange(DataSnapshot dataSnapshot) {
-			chatRoomView.setRefresh(true, context.getString(R.string.messsge_updateing));
 			data.clear();
 			if(dataSnapshot.getChildrenCount() > 0) {
 				for (DataSnapshot item: dataSnapshot.getChildren()) {
@@ -117,12 +106,11 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 				}
 			}
 			chatRoomView.onNotify(data);
-			chatRoomView.setRefresh(false, "");
 		}
 
 		@Override
 		public void onCancelled(DatabaseError databaseError) {
-			Toast.makeText(context, databaseError.toException().toString(), Toast.LENGTH_SHORT).show();
+			L.e(TAG,  databaseError.toException().toString());
 		}
 	};
 

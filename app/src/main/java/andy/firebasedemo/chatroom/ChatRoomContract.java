@@ -3,6 +3,7 @@ package andy.firebasedemo.chatroom;
 import java.util.List;
 
 import andy.firebasedemo.main.BasePresenter;
+import andy.firebasedemo.main.BaseView;
 import andy.firebasedemo.object.Message;
 
 /**
@@ -11,7 +12,7 @@ import andy.firebasedemo.object.Message;
 
 public interface ChatRoomContract {
 
-	interface View {
+	interface View  extends BaseView{
 
 		void sendMessageReady();
 
@@ -22,10 +23,6 @@ public interface ChatRoomContract {
 		void onNotify(List<Message> data);
 
 		void onNotify();
-
-		void setRefresh(boolean isRefresh, String progressMsg);
-
-		void onLoginFailed();
 	}
 
 	interface Presenter extends BasePresenter {

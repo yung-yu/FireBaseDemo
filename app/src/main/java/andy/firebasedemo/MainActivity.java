@@ -1,6 +1,7 @@
 package andy.firebasedemo;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,14 +9,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,145 +25,86 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.List;
-
-import andy.firebasedemo.adapter.ChatRoomMessageAdapter;
+import andy.firebasedemo.Log.L;
+import andy.firebasedemo.auth.AuthContract;
+import andy.firebasedemo.auth.AuthPresenterImp;
+import andy.firebasedemo.chatroom.ChatRoomFragment;
 import andy.firebasedemo.login.LoginDialogFragment;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.manager.MemberManager;
-import andy.firebasedemo.chatroom.ChatRoomContract;
-import andy.firebasedemo.chatroom.ChatRoomPresenterImp;
 import andy.firebasedemo.object.Member;
-import andy.firebasedemo.object.Message;
+import andy.firebasedemo.util.AndroidUtils;
 
 /**
  * Created by andyli on 2016/11/7.
  */
-public class ChatRoomActivity extends AppCompatActivity implements ChatRoomContract.View {
-	private EditText editText;
-	private Button button;
-	private ListView listView;
-	private ChatRoomPresenterImp mMessagePresenterImp;
-	private ChatRoomMessageAdapter mMsgAdapter;
+public class MainActivity extends AppCompatActivity implements AuthContract.View {
+    private final static String TAG = "MainActivity";
 	private Toolbar mToolbar;
-	private LoginDialogFragment mLoginDialogFragment;
 	private ProgressBar toolbarProgressBar;
 	private TextView toolbar_text;
+	private LoginDialogFragment mLoginDialogFragment;
+	private AuthPresenterImp mAuthPresenterImp;
+	private ChatRoomFragment mChatRoomFragment;
+
 
 
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
+		L.i(TAG, "onCreate");
 		FacebookSdk.sdkInitialize(getApplicationContext());
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_chatroom);
-		editText = (EditText) findViewById(R.id.editText);
-		button = (Button) findViewById(R.id.button);
-		listView = (ListView) findViewById(R.id.listview);
+		setContentView(R.layout.activity_main);
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		toolbarProgressBar = (ProgressBar) findViewById(R.id.toolbar_progress_bar);
 		toolbar_text = (TextView) findViewById(R.id.toolbar_text);
 		setSupportActionBar(mToolbar);
-		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				mMessagePresenterImp.sendMessage(editText.getText().toString());
-			}
-		});
-		mMsgAdapter = new ChatRoomMessageAdapter(this);
-		listView.setAdapter(mMsgAdapter);
-		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-				final Message msg = mMsgAdapter.getItem(i);
-				FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-				if(user != null && msg.fromId.equals(user.getUid())) {
-					new AlertDialog.Builder(ChatRoomActivity.this)
-							.setMessage(R.string.app_name)
-							.setMessage(R.string.delete_tip)
-							.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialogInterface, int i) {
-
-									FireBaseManager.getInstance().deleteMessage(msg.id);
-									dialogInterface.cancel();
-								}
-							})
-							.setNegativeButton(R.string.cancel, null)
-							.create().show();
-				}
-				return true;
-			}
-		});
-		mMessagePresenterImp = new ChatRoomPresenterImp(this, this);
+		mAuthPresenterImp = new AuthPresenterImp() ;
+		mAuthPresenterImp.setAuthView(this);
+		mChatRoomFragment = new ChatRoomFragment();
 	}
 
 	@Override
 	protected void onStart() {
+		L.i(TAG, "onStart");
 		super.onStart();
-		mMessagePresenterImp.start();
+		mAuthPresenterImp.start();
+
 	}
 
 	@Override
 	protected void onResume() {
+		L.i(TAG, "onResume");
 		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
+		L.i(TAG, "onPause");
 		super.onPause();
 	}
 
 	@Override
 	protected void onStop() {
+		L.i(TAG, "onStop");
 		super.onStop();
-		mMessagePresenterImp.stop();
+		mAuthPresenterImp.stop();
+
 	}
 
 	@Override
 	protected void onDestroy() {
+		L.i(TAG, "onDestroy");
 		super.onDestroy();
 	}
 
 	@Override
-	public void sendMessageReady() {
-		button.setEnabled(false);
-	}
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(mLoginDialogFragment != null){
+			mLoginDialogFragment.onActivityResult(requestCode, resultCode, data);
+		}
 
-	@Override
-	public void sendMessageSuccess() {
-		button.setEnabled(true);
-		editText.setText("");
-	}
-
-	@Override
-	public void sendMessageFailed(String msg) {
-		button.setEnabled(true);
-		editText.setText("");
-		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void onNotify(List<Message> data) {
-		mMsgAdapter.setData(data);
-		mMsgAdapter.notifyDataSetChanged();
-		listView.setSelection(data.size());
-	}
-
-	@Override
-	public void onNotify() {
-		mMsgAdapter.notifyDataSetChanged();
-	}
-
-	@Override
-	public void setRefresh(boolean isRefresh, String progressMsg) {
-		toolbarProgressBar.setVisibility(isRefresh?View.VISIBLE:View.GONE);
-		toolbar_text.setVisibility(isRefresh?View.VISIBLE:View.GONE);
-		toolbar_text.setText(progressMsg);
-	}
-
-	@Override
-	public void onLoginFailed() {
-		showLoginDialog();
 	}
 
 	@Override
@@ -197,9 +137,7 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatRoomContr
 						   FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 						   if(user != null) {
 							   FirebaseAuth.getInstance().signOut();
-							   mMsgAdapter.notifyDataSetChanged();
-							   Toast.makeText(ChatRoomActivity.this, R.string.loginOutSuccess, Toast.LENGTH_SHORT).show();
-							   mMessagePresenterImp.stop();
+							   Toast.makeText(MainActivity.this, R.string.loginOutSuccess, Toast.LENGTH_SHORT).show();
 						   }
 					   }
 				   }).setNegativeButton(R.string.cancel, null)
@@ -215,15 +153,15 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatRoomContr
 		return true;
 	}
 
-
-
 	private void showLoginDialog(){
 		if(mLoginDialogFragment == null){
 			mLoginDialogFragment = new LoginDialogFragment();
 			mLoginDialogFragment.setOnLoginSuccessListener(new LoginDialogFragment.OnLoginSuccessListener() {
 				@Override
 				public void onLogin() {
-					mMessagePresenterImp.start();
+					if(mChatRoomFragment != null) {
+						mChatRoomFragment.onStart();
+					}
 				}
 			});
 		}
@@ -255,10 +193,9 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatRoomContr
 									@Override
 									public void onComplete(@NonNull Task task) {
 										if(task.isSuccessful()){
-											Toast.makeText(ChatRoomActivity.this, R.string.update_success, Toast.LENGTH_SHORT).show();
-											mMsgAdapter.notifyDataSetChanged();
+											Toast.makeText(MainActivity.this, R.string.update_success, Toast.LENGTH_SHORT).show();
 										}else{
-											Toast.makeText(ChatRoomActivity.this, R.string.update_failed, Toast.LENGTH_SHORT).show();
+											Toast.makeText(MainActivity.this, R.string.update_failed, Toast.LENGTH_SHORT).show();
 										}
 									}
 								});
@@ -270,6 +207,19 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatRoomContr
 					.create().show();
 		}
 
+	}
+
+	@Override
+	public void onAuthSignOut() {
+		showLoginDialog();
+		if(mChatRoomFragment != null) {
+			mChatRoomFragment.onNotify();
+		}
+	}
+
+	@Override
+	public void onLogin() {
+		AndroidUtils.startFragment(getSupportFragmentManager(), mChatRoomFragment, R.id.fragment_container, null , false);
 	}
 }
 
