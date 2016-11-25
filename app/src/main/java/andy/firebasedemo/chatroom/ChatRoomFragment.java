@@ -3,6 +3,7 @@ package andy.firebasedemo.chatroom;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -33,12 +34,15 @@ import andy.firebasedemo.object.Message;
 
 public class ChatRoomFragment extends Fragment implements ChatRoomContract.View{
 	private final static String TAG = "ChatRoomFragment";
+	private final static int GET_PHOTO_REQUEST_CODE = 8888;
 	private EditText editText;
 	private Button button;
+	private Button sendImage;
 	private ListView listView;
 	private ChatRoomPresenterImp mMessagePresenterImp;
 	private ChatRoomMessageAdapter mMsgAdapter;
 	private Context context;
+
 
 	@Override
 	public void onAttach(Context context) {
@@ -65,11 +69,21 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View{
 		super.onViewCreated(view, savedInstanceState);
 		editText = (EditText) view.findViewById(R.id.editText);
 		button = (Button) view.findViewById(R.id.button);
+		sendImage = (Button) view.findViewById(R.id.sendImage);
 		listView = (ListView) view.findViewById(R.id.listview);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				mMessagePresenterImp.sendMessage(editText.getText().toString());
+			}
+		});
+		sendImage.setOnClickListener(new View.OnClickListener(){
+
+			@Override
+			public void onClick(View view) {
+				Intent it = new Intent(Intent.ACTION_GET_CONTENT);
+				it.setType("image/*");
+				startActivityForResult(it, GET_PHOTO_REQUEST_CODE);
 			}
 		});
 		mMsgAdapter = new ChatRoomMessageAdapter(context);
@@ -105,7 +119,7 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View{
 	public void onStart() {
 		L.i(TAG, "onStart");
 		super.onStart();
-		if(mMessagePresenterImp!= null) {
+		if(mMessagePresenterImp != null) {
 			mMessagePresenterImp.start();
 		}
 	}
@@ -144,6 +158,10 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View{
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == GET_PHOTO_REQUEST_CODE){
+			Uri uri = data.getData();
+			mMessagePresenterImp.sendImage(uri);
+		}
 	}
 
 	@Override
@@ -180,5 +198,20 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View{
 		if(mMsgAdapter != null) {
 			mMsgAdapter.notifyDataSetChanged();
 		}
+	}
+
+	@Override
+	public void sendImageSuccess() {
+
+	}
+
+	@Override
+	public void onImageUploadProgress(int progress) {
+
+	}
+
+	@Override
+	public void sendImageFailed(String msg) {
+
 	}
 }

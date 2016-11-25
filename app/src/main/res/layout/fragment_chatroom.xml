@@ -29,8 +29,6 @@
             android:id="@+id/editText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:padding="5dp"
             android:background="@null"
@@ -40,8 +38,19 @@
             android:textColor="#fff"
             android:textColorHint="#fff"
             android:layout_toLeftOf="@+id/button"
-            android:layout_toStartOf="@+id/button"
-            android:layout_alignBottom="@+id/button"/>
+            android:layout_alignBottom="@+id/button"
+            android:layout_toRightOf="@+id/sendImage"
+            android:layout_toEndOf="@+id/sendImage"/>
+
+        <Button
+            android:text="+"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:background="@null"
+            android:textColor="#fff"
+            android:id="@+id/sendImage"/>
     </RelativeLayout>
 
     <ListView

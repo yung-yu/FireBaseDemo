@@ -41,8 +41,15 @@
                     android:gravity="top|left"
                     android:maxEms="10"
                     android:text="test"
-
                     android:textSize="16sp"/>
+
+                <ImageView
+                    android:id="@+id/leftPhoto"
+                    android:maxWidth="100dp"
+                    android:scaleType="fitCenter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
             </android.support.v7.widget.CardView>
 
             <TextView
@@ -56,6 +63,7 @@
                 android:text="test"
                 android:gravity="left"
                 android:textSize="12sp"/>
+
         </RelativeLayout>
     </LinearLayout>
 
@@ -90,6 +98,12 @@
                     android:maxEms="10"
                     android:textSize="16sp"
                     />
+                <ImageView
+                    android:id="@+id/rightPhoto"
+                    android:maxWidth="100dp"
+                    android:scaleType="fitCenter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
             </android.support.v7.widget.CardView>
 
             <TextView

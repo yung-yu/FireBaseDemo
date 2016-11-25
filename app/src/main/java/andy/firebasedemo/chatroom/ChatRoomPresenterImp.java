@@ -2,11 +2,15 @@ package andy.firebasedemo.chatroom;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.storage.StorageManager;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,6 +19,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +33,7 @@ import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.manager.MemberManager;
 import andy.firebasedemo.object.Message;
+import andy.firebasedemo.object.MessageType;
 
 /**
  * Created by andyli on 2016/11/5.
@@ -67,6 +76,59 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 				}
 			}
 		});
+
+	}
+
+	@Override
+	public void sendImage(Uri fileUri) {
+
+		StorageReference imagesRef = FirebaseStorage.getInstance().getReference("images");
+		UploadTask uploadTask = imagesRef.child("photo").putFile(fileUri);
+		uploadTask.addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+				L.e(exception);
+				chatRoomView.sendImageFailed(exception.toString());
+			}
+		}).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+			@Override
+			public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+				long cur = taskSnapshot.getBytesTransferred();
+				long tal = taskSnapshot.getTotalByteCount();
+				L.d(TAG, "cur "+cur);
+				L.d(TAG, "tal "+tal);
+				chatRoomView.onImageUploadProgress((int)((cur/tal)*100L));
+
+			}
+		}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+			@Override
+			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+				L.d(TAG, "url "+taskSnapshot.getDownloadUrl());
+				L.d(TAG, "metaData "+taskSnapshot.getMetadata().getContentType());
+				FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+				if(user == null){
+					chatRoomView.sendMessageFailed(context.getString(R.string.please_login));
+					return;
+				}
+
+				Message msg = new Message(user.getUid(),
+						MessageType.Photo.name(),
+						taskSnapshot.getDownloadUrl().toString(),
+						System.currentTimeMillis());
+				FireBaseManager.getInstance().sendMessage(msg, new OnCompleteListener<Void>() {
+					@Override
+					public void onComplete(@NonNull Task<Void> task) {
+						if(task.isSuccessful()) {
+							chatRoomView.sendImageSuccess();
+						}else{
+							chatRoomView.sendImageFailed(task.getException().getMessage());
+						}
+					}
+				});
+
+			}
+		});
+
 
 	}
 

@@ -55,7 +55,7 @@ public class MemberManager implements ChildEventListener {
 		}
 	}
 
-	public List<Member> getOffLineMembers(){
+	public List<Member> getOffLingetOffLineMemberseMembers(){
 		List<Member> members = new ArrayList<>();
 		for(HashMap.Entry<String, Member> entry :memberCache.entrySet()){
 			if(entry != null){

@@ -24,7 +24,7 @@ public class L {
         className = className.substring(className.lastIndexOf(".")+1);
         String methodName =  elements[4].getMethodName();
 
-        return "-["+ Thread.currentThread().getId()+"]"+"["+className+"]"+"["+methodName+"]"+"["+elements[4].getLineNumber()+"]-";
+        return "["+ Thread.currentThread().getId()+"]"+"["+className+"]"+"["+methodName+"]"+"["+elements[4].getLineNumber()+"]";
     }
     public static void d(String tag, String msg){
         if(!IS_DEBUG){

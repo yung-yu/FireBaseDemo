@@ -1,5 +1,7 @@
 package andy.firebasedemo.chatroom;
 
+import android.net.Uri;
+
 import java.util.List;
 
 import andy.firebasedemo.main.BasePresenter;
@@ -23,9 +25,16 @@ public interface ChatRoomContract {
 		void onNotify(List<Message> data);
 
 		void onNotify();
+
+		void sendImageSuccess();
+
+		void onImageUploadProgress(int progress);
+
+		void sendImageFailed(String msg);
 	}
 
 	interface Presenter extends BasePresenter {
 		void sendMessage(String message);
+		void sendImage(Uri uri);
 	}
 }

@@ -47,6 +47,7 @@ import andy.firebasedemo.R;
 import andy.firebasedemo.manager.MemberManager;
 import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
+import andy.firebasedemo.object.MessageType;
 import andy.firebasedemo.util.TimeUtils;
 
 
@@ -95,6 +96,8 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 		TextView rightText;
 		TextView leftTime;
 		TextView rightTime;
+		ImageView leftPhoto;
+		ImageView rightPhoto;
 	}
 	private boolean isMe(String uid){
 		return  FirebaseAuth.getInstance().getCurrentUser() != null
@@ -114,22 +117,48 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 			vh.rightTextContent = (LinearLayout) view.findViewById(R.id.rightTextContent);
 			vh.leftTime = (TextView) view.findViewById(R.id.leftTime);
 			vh.rightTime = (TextView) view.findViewById(R.id.rightTime);
+			vh.leftPhoto = (ImageView) view.findViewById(R.id.leftPhoto);
+			vh.rightPhoto = (ImageView) view.findViewById(R.id.rightPhoto);
 			view.setTag(vh);
 		}else{
 			vh = (ViewHolder) view.getTag();
 		}
 		Message message = getItem(i);
-
+		vh.leftPhoto.setImageResource(0);
+		vh.rightPhoto.setImageResource(0);
 		if(message != null) {
+			MessageType msgType = MessageType.text;
+			if(!TextUtils.isEmpty(message.type)) {
+				msgType = MessageType.valueOf(message.type);
+			}
 			Member member = MemberManager.getInstance().getMemberById(message.fromId);
 			if (member != null) {
 				if (isMe(message.fromId)) {
 					vh.leftTextContent.setVisibility(View.GONE);
 					vh.rightTextContent.setVisibility(View.VISIBLE);
 					vh.rightTime.setText(TimeUtils.getTimeFormatStr(message.time));
-					vh.rightText.setText(member.name + "說:\n" + message.text);
+
+					if(msgType == null || msgType.equals(MessageType.text)){
+						vh.rightText.setVisibility(View.VISIBLE);
+						vh.rightPhoto.setVisibility(View.GONE);
+						vh.rightText.setText(member.name + "說:\n" + message.text);
+					} else if (msgType.equals(MessageType.Photo)){
+						vh.rightText.setVisibility(View.GONE);
+						vh.rightPhoto.setVisibility(View.VISIBLE);
+						vh.rightPhoto.setTag(message.downloadUrl);
+						Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
+						vh.leftPhoto.setTag(null);
+						if (bitmap != null && !bitmap.isRecycled()) {
+							vh.rightPhoto.setImageBitmap(bitmap);
+						} else {
+							vh.rightPhoto.setTag(message.downloadUrl);
+							imageLoader.displayImage(message.downloadUrl, vh.rightPhoto, getDisplayImageOptions());
+						}
+					}
+
 					vh.rightHeader.setTag(member.icon);
 					vh.leftHeader.setTag(null);
+
 					if (!TextUtils.isEmpty(member.icon)) {
 						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
 						if (bitmap != null && !bitmap.isRecycled()) {
@@ -146,8 +175,23 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 					vh.rightTextContent.setVisibility(View.GONE);
 					vh.leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
 					vh.leftHeader.setTag(member.icon);
-					vh.rightText.setText(null);
-					vh.leftText.setText(member.name + "說:\n" + message.text);
+					if(msgType == null || msgType.equals(MessageType.text)){
+						vh.leftText.setVisibility(View.VISIBLE);
+						vh.leftPhoto.setVisibility(View.GONE);
+						vh.leftText.setText(member.name + "說:\n" + message.text);
+					} else if (msgType.equals(MessageType.Photo)){
+						vh.leftText.setVisibility(View.GONE);
+						vh.leftPhoto.setVisibility(View.VISIBLE);
+						vh.leftPhoto.setTag(message.downloadUrl);
+						Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
+						vh.rightPhoto.setTag(null);
+						if (bitmap != null && !bitmap.isRecycled()) {
+							vh.leftPhoto.setImageBitmap(bitmap);
+						} else {
+							vh.leftPhoto.setTag(message.downloadUrl);
+							imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
+						}
+					}
 					if (!TextUtils.isEmpty(member.icon)) {
 						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
 						if (bitmap != null && !bitmap.isRecycled()) {
@@ -166,7 +210,23 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 				vh.leftHeader.setTag(null);
 				vh.leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
 				vh.leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
-				vh.leftText.setText("某人說:\n" + message.text);
+				if(msgType == null || msgType.equals(MessageType.text)){
+					vh.leftText.setVisibility(View.VISIBLE);
+					vh.leftPhoto.setVisibility(View.GONE);
+					vh.leftText.setText("某人說:\n" + message.text);
+				} else if (msgType.equals(MessageType.Photo)){
+					vh.leftText.setVisibility(View.GONE);
+					vh.leftPhoto.setVisibility(View.VISIBLE);
+					vh.leftPhoto.setTag(message.downloadUrl);
+					Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
+					vh.rightPhoto.setTag(null);
+					if (bitmap != null && !bitmap.isRecycled()) {
+						vh.leftPhoto.setImageBitmap(bitmap);
+					} else {
+						vh.leftPhoto.setTag(message.downloadUrl);
+						imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
+					}
+				}
 			}
 
 		}
@@ -207,7 +267,7 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 			@Override
 			public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
 				ImageView imageView = (ImageView) view;
-				if(imageUri.equals(imageView.getTag().toString())){
+				if(imageUri.equals(imageView.getTag())){
 					imageView.setImageBitmap(loadedImage);
 				}
 			}
