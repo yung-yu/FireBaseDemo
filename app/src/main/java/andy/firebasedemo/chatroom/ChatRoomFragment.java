@@ -105,7 +105,9 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View{
 	public void onStart() {
 		L.i(TAG, "onStart");
 		super.onStart();
-		mMessagePresenterImp.start();
+		if(mMessagePresenterImp!= null) {
+			mMessagePresenterImp.start();
+		}
 	}
 
 	@Override
@@ -164,13 +166,19 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View{
 
 	@Override
 	public void onNotify(List<Message> data) {
-		mMsgAdapter.setData(data);
-		mMsgAdapter.notifyDataSetChanged();
-		listView.setSelection(data.size());
+		if(mMsgAdapter != null) {
+			mMsgAdapter.setData(data);
+			mMsgAdapter.notifyDataSetChanged();
+		}
+		if(listView != null) {
+			listView.setSelection(data.size());
+		}
 	}
 
 	@Override
 	public void onNotify() {
-		mMsgAdapter.notifyDataSetChanged();
+		if(mMsgAdapter != null) {
+			mMsgAdapter.notifyDataSetChanged();
+		}
 	}
 }

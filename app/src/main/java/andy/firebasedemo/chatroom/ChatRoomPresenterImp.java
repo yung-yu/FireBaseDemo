@@ -35,7 +35,7 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 	private ChatRoomContract.View chatRoomView;
 	private Context context;
 	private DatabaseReference messageDatabase;
-	private List< Message> data;
+	private List<Message> data;
 
 	public ChatRoomPresenterImp(Context context, ChatRoomContract.View chatRoomView) {
 		this.chatRoomView = chatRoomView;

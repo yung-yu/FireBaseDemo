@@ -74,16 +74,11 @@
 
     <Button
         android:id="@+id/facebookButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
+        android:layout_margin="5dp"
         android:text="@string/fb_login"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
         android:textColor="@android:color/white"
         android:background="@drawable/com_facebook_button_background" />
 </LinearLayout>
