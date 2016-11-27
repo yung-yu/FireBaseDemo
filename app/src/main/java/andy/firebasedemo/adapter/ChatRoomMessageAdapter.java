@@ -124,8 +124,6 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 			vh = (ViewHolder) view.getTag();
 		}
 		Message message = getItem(i);
-		vh.leftPhoto.setImageResource(0);
-		vh.rightPhoto.setImageResource(0);
 		if(message != null) {
 			MessageType msgType = MessageType.text;
 			if(!TextUtils.isEmpty(message.type)) {
@@ -151,6 +149,7 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 						if (bitmap != null && !bitmap.isRecycled()) {
 							vh.rightPhoto.setImageBitmap(bitmap);
 						} else {
+							vh.rightPhoto.setImageBitmap(null);
 							vh.rightPhoto.setTag(message.downloadUrl);
 							imageLoader.displayImage(message.downloadUrl, vh.rightPhoto, getDisplayImageOptions());
 						}
@@ -188,6 +187,7 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 						if (bitmap != null && !bitmap.isRecycled()) {
 							vh.leftPhoto.setImageBitmap(bitmap);
 						} else {
+							vh.leftPhoto.setImageBitmap(null);
 							vh.leftPhoto.setTag(message.downloadUrl);
 							imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
 						}
@@ -223,6 +223,7 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 					if (bitmap != null && !bitmap.isRecycled()) {
 						vh.leftPhoto.setImageBitmap(bitmap);
 					} else {
+						vh.leftPhoto.setImageBitmap(null);
 						vh.leftPhoto.setTag(message.downloadUrl);
 						imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
 					}
@@ -284,7 +285,7 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
 				.cacheOnDisk(true)
-				.resetViewBeforeLoading(false)
+				.resetViewBeforeLoading(true)
 				.build();
 	}
 }

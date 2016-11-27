@@ -47,6 +47,8 @@
                     android:id="@+id/leftPhoto"
                     android:maxWidth="100dp"
                     android:maxHeight="100dp"
+                    android:minWidth="50dp"
+                    android:minHeight="50dp"
                     android:scaleType="fitCenter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
@@ -103,6 +105,8 @@
                     android:id="@+id/rightPhoto"
                     android:maxWidth="100dp"
                     android:maxHeight="100dp"
+                    android:minWidth="50dp"
+                    android:minHeight="50dp"
                     android:scaleType="fitCenter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
