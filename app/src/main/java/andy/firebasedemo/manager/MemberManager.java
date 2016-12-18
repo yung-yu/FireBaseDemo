@@ -55,17 +55,17 @@ public class MemberManager implements ChildEventListener {
 		}
 	}
 
-	public List<Member> getOffLingetOffLineMemberseMembers(){
-		List<Member> members = new ArrayList<>();
+	public List<String> getOffLingetOffLineMemberseMemberTokens(){
+		List<String> tokens = new ArrayList<>();
 		for(HashMap.Entry<String, Member> entry :memberCache.entrySet()){
 			if(entry != null){
 				Member member = entry.getValue();
 				if(member.status == Member.STATUS_OFFLINE){
-					members.add(member);
+					tokens.add(member.token);
 				}
 			}
 		}
-		return members;
+		return tokens;
 	}
 	public List<Member> getAllMembers(){
 		List<Member> members = new ArrayList<>();

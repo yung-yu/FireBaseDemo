@@ -17,12 +17,18 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import andy.firebasedemo.main.SystemＣonstants;
 import andy.firebasedemo.object.LoginFailedTask;
 import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
+import andy.firebasedemo.object.MessageType;
 
 /**
  * Created by andyli on 2016/10/19.
@@ -105,7 +111,6 @@ public class FireBaseManager {
 
 
 	public void requestFBUserId() {
-
 //		FirebaseUser user = mAuth.getCurrentUser();
 //		if (user != null) {
 //			user.getToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
@@ -138,6 +143,10 @@ public class FireBaseManager {
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
 		mMessagesReference.push().setValue(item).addOnCompleteListener(listener);
+		List<String> data = MemberManager.getInstance().getOffLingetOffLineMemberseMemberTokens();
+		if (data.size() > 0) {
+			sendNotification(data, myMember.name, item.type.equals(MessageType.text.name()) ? item.text : item.type.equals(MessageType.Photo.name()) ? "傳送一張圖片" : "");
+		}
 	}
 
 
@@ -146,21 +155,24 @@ public class FireBaseManager {
 	}
 
 
-	public void sendNotification(final String token , final String sender, final String msg) {
+	public void sendNotification(final List<String> token , final String sender, final String msg) {
 		new Thread("SendFCM"){
 			@Override
 			public void run() {
 				try {
-					String jsonMessage = "{\"notification\":{\n" +
-							"\"title\":\"" + sender + "\"," +
-							"\"sound\":\"" + "default" + "\"," +
-							"\"tag\":\"" + 999 + "\"," +
-							"\"body\": \"" + msg + "\"\n" +
-							"  },\n" +
-							"  \"to\" : \"" + token + "\"" +
-							"}";
-					Log.d(TAG, jsonMessage);
-					RequestBody body = RequestBody.create(JSON, jsonMessage.trim());
+					JSONObject  jsonObject= new JSONObject();
+					if(token.size() == 1) {
+						jsonObject.put("to", token.get(0));
+					} else {
+						jsonObject.put("registration_ids", new JSONArray(token));
+					}
+					jsonObject.put("priority" , "High");
+					JSONObject notificationJson = new JSONObject();
+					notificationJson.put("text", msg);
+					notificationJson.put("sender", sender);
+					jsonObject.put("data", notificationJson);
+					Log.d(TAG, jsonObject.toString());
+					RequestBody body = RequestBody.create(JSON, jsonObject.toString().trim());
 					OkHttpClient client = new OkHttpClient();
 					Request request = new Request.Builder()
 							.url(FCM_SEND_API)
@@ -175,14 +187,6 @@ public class FireBaseManager {
 			}
 		}.start();
 
-	}
-
-	public void signOut(){
-		if(FirebaseAuth.getInstance().getCurrentUser() != null) {
-			loginOut();
-			FirebaseAuth.getInstance().getCurrentUser().delete();
-			mAuth.signOut();
-		}
 	}
 
 	public void sendToken(String token) {

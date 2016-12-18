@@ -53,6 +53,7 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 	private ChatRoomMessageAdapter mMsgAdapter;
 	private Context context;
 	private AnimatorSet mCurrentAnimator;
+	private ImageView expandedImageView;
 
 
 	@Override
@@ -83,6 +84,8 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 		button = (Button) view.findViewById(R.id.button);
 		sendImage = (Button) view.findViewById(R.id.sendImage);
 		listView = (ListView) view.findViewById(R.id.listview);
+
+		expandedImageView = (ImageView) view.findViewById(R.id.expanded_image);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -108,10 +111,10 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 				if(msg.type != null && msg.type.equals(MessageType.Photo.name())){
 					if(user != null && msg.fromId.equals(user.getUid())){
 						ImageView imageView = (ImageView) view.findViewById(R.id.rightPhoto);
-						zoomImageFromThumb(imageView);
+						zoomImageFromThumb(imageView, expandedImageView, mMsgAdapter.getBitmap(msg.downloadUrl));
 					}else{
 						ImageView imageView = (ImageView) view.findViewById(R.id.leftPhoto);
-						zoomImageFromThumb(imageView);
+						zoomImageFromThumb(imageView, expandedImageView, mMsgAdapter.getBitmap(msg.downloadUrl));
 					}
 				}
 			}
@@ -245,15 +248,14 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 
 
 
-	private void zoomImageFromThumb(final ImageView thumbView) {
+	private void zoomImageFromThumb(final ImageView thumbView, final ImageView expandedImageView, Bitmap bmp) {
 
 		if (mCurrentAnimator != null) {
 			mCurrentAnimator.cancel();
 		}
 
-		final ImageView expandedImageView = (ImageView) getView().findViewById(
-				R.id.expanded_image);
-		expandedImageView.setImageDrawable(thumbView.getDrawable());
+
+		expandedImageView.setImageBitmap(bmp);
 
 		final Rect startBounds = new Rect();
 		final Rect finalBounds = new Rect();

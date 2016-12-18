@@ -2,6 +2,7 @@ package andy.firebasedemo.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -287,5 +288,13 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 				.cacheOnDisk(true)
 				.resetViewBeforeLoading(true)
 				.build();
+	}
+
+	public Bitmap getBitmap(String url){
+		File file = imageLoader != null? imageLoader.getDiskCache().get(url): null;
+		if(file != null && file.exists()){
+			return  BitmapFactory.decodeFile(file.getPath());
+		}
+		return  null;
 	}
 }
