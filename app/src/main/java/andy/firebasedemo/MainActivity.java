@@ -41,8 +41,7 @@ import andy.firebasedemo.util.AndroidUtils;
 public class MainActivity extends AppCompatActivity implements AuthContract.View {
     private final static String TAG = "MainActivity";
 	private Toolbar mToolbar;
-	private ProgressBar toolbarProgressBar;
-	private TextView toolbar_text;
+
 	private LoginDialogFragment mLoginDialogFragment;
 	private AuthPresenterImp mAuthPresenterImp;
 	private ChatRoomFragment mChatRoomFragment;
@@ -56,12 +55,13 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
-		toolbarProgressBar = (ProgressBar) findViewById(R.id.toolbar_progress_bar);
-		toolbar_text = (TextView) findViewById(R.id.toolbar_text);
+
+		ＴoolbarUIHelper.getInstance().init((ProgressBar) findViewById(R.id.toolbar_progress_bar),
+				(TextView) findViewById(R.id.toolbar_text));
 		setSupportActionBar(mToolbar);
 		mAuthPresenterImp = new AuthPresenterImp() ;
 		mAuthPresenterImp.setAuthView(this);
-		mChatRoomFragment = new ChatRoomFragment();
+
 	}
 
 	@Override
@@ -159,8 +159,12 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 			mLoginDialogFragment.setOnLoginSuccessListener(new LoginDialogFragment.OnLoginSuccessListener() {
 				@Override
 				public void onLogin() {
+
 					if(mChatRoomFragment != null) {
-						mChatRoomFragment.onStart();
+						mChatRoomFragment.onNotify();
+					} else {
+						mChatRoomFragment = new ChatRoomFragment();
+						AndroidUtils.startFragment(getSupportFragmentManager(), mChatRoomFragment, R.id.fragment_container, null , false);
 					}
 				}
 			});
@@ -214,12 +218,20 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 		showLoginDialog();
 		if(mChatRoomFragment != null) {
 			mChatRoomFragment.onNotify();
+		} else {
+			mChatRoomFragment = new ChatRoomFragment();
+			AndroidUtils.startFragment(getSupportFragmentManager(), mChatRoomFragment, R.id.fragment_container, null , false);
 		}
 	}
 
 	@Override
 	public void onLogin() {
-		AndroidUtils.startFragment(getSupportFragmentManager(), mChatRoomFragment, R.id.fragment_container, null , false);
+		if(mChatRoomFragment != null) {
+			mChatRoomFragment.onNotify();
+		} else {
+			mChatRoomFragment = new ChatRoomFragment();
+			AndroidUtils.startFragment(getSupportFragmentManager(), mChatRoomFragment, R.id.fragment_container, null , false);
+		}
 	}
 }
 

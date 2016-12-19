@@ -29,4 +29,14 @@ public class AndroidUtils {
 		}
 
 	}
+
+
+	public static void finish(FragmentManager manager){
+		try {
+			manager.popBackStackImmediate();
+		}catch (Exception e){
+			L.e(e);
+		}
+
+	}
 }
