@@ -35,6 +35,7 @@ public interface ChatRoomContract {
 
 	interface Presenter extends BasePresenter {
 		void sendMessage(String message);
+
 		void sendImage(Uri uri);
 	}
 }
