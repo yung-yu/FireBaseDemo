@@ -143,10 +143,10 @@ public class FireBaseManager {
 
 	public void sendMessage(Message item, OnCompleteListener<Void> listener) {
 		mMessagesReference.push().setValue(item).addOnCompleteListener(listener);
-		List<String> data = MemberManager.getInstance().getOffLingetOffLineMemberseMemberTokens();
-		if (data.size() > 0) {
-			sendNotification(data, myMember.name, item.type.equals(MessageType.text.name()) ? item.text : item.type.equals(MessageType.Photo.name()) ? "傳送一張圖片" : "");
-		}
+//		List<String> data = MemberManager.getInstance().getOffLingetOffLineMemberseMemberTokens();
+//		if (data.size() > 0) {
+//			sendNotification(data, myMember.name, item.type.equals(MessageType.text.name()) ? item.text : item.type.equals(MessageType.Photo.name()) ? "傳送一張圖片" : "");
+//		}
 	}
 
 
