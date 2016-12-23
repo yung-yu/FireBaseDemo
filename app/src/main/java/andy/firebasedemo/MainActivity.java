@@ -54,13 +54,11 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
-
 		ToolbarUIHelper.getInstance().init((ProgressBar) findViewById(R.id.toolbar_progress_bar),
 				(TextView) findViewById(R.id.toolbar_text));
 		setSupportActionBar(mToolbar);
 		mAuthPresenterImp = new AuthPresenterImp() ;
 		mAuthPresenterImp.setAuthView(this);
-
 	}
 
 	@Override
@@ -158,13 +156,7 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 			mLoginDialogFragment.setOnLoginSuccessListener(new LoginDialogFragment.OnLoginSuccessListener() {
 				@Override
 				public void onLogin() {
-
-					if(mChatRoomFragment != null) {
-						mChatRoomFragment.onNotify();
-					} else {
-						mChatRoomFragment = new ChatRoomFragment();
-						AndroidUtils.startFragment(getSupportFragmentManager(), mChatRoomFragment, R.id.fragment_container, null , false);
-					}
+					openChatRoom();
 				}
 			});
 		}
@@ -196,6 +188,9 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 									@Override
 									public void onComplete(@NonNull Task task) {
 										if(task.isSuccessful()){
+											if(mChatRoomFragment != null) {
+												mChatRoomFragment.onNotify();
+											}
 											Toast.makeText(MainActivity.this, R.string.update_success, Toast.LENGTH_SHORT).show();
 										}else{
 											Toast.makeText(MainActivity.this, R.string.update_failed, Toast.LENGTH_SHORT).show();
@@ -217,14 +212,15 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 		showLoginDialog();
 		if(mChatRoomFragment != null) {
 			mChatRoomFragment.onNotify();
-		} else {
-			mChatRoomFragment = new ChatRoomFragment();
-			AndroidUtils.startFragment(getSupportFragmentManager(), mChatRoomFragment, R.id.fragment_container, null , false);
 		}
 	}
 
 	@Override
 	public void onLogin() {
+		openChatRoom();
+	}
+
+	private void openChatRoom(){
 		if(mChatRoomFragment != null) {
 			mChatRoomFragment.onNotify();
 		} else {
@@ -232,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 			AndroidUtils.startFragment(getSupportFragmentManager(), mChatRoomFragment, R.id.fragment_container, null , false);
 		}
 	}
+
 }
 
 
