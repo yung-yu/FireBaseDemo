@@ -37,7 +37,6 @@ import andy.firebasedemo.adapter.ChatRoomMessageAdapter;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.object.Message;
 import andy.firebasedemo.object.MessageType;
-import andy.firebasedemo.ＴoolbarUIHelper;
 
 /**
  * Created by andyli on 2016/11/25.

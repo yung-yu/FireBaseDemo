@@ -31,12 +31,11 @@ public class AndroidUtils {
 	}
 
 
-	public static void finish(FragmentManager manager){
+	public static void popAllFragments(FragmentManager manager){
 		try {
-			manager.popBackStackImmediate();
+			manager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		}catch (Exception e){
 			L.e(e);
 		}
-
 	}
 }

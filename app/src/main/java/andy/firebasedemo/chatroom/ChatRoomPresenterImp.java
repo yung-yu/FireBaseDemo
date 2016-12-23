@@ -173,7 +173,6 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 			}
 			chatRoomView.onNotify(data);
 		}
-
 		@Override
 		public void onCancelled(DatabaseError databaseError) {
 			L.e(TAG,  databaseError.toException().toString());

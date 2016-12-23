@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import andy.firebasedemo.R;
 import andy.firebasedemo.manager.FireBaseManager;
-import andy.firebasedemo.ＴoolbarUIHelper;
+import andy.firebasedemo.helper.ToolbarUIHelper;
 
 /**
  * Created by andyli on 2016/11/25.
@@ -23,17 +23,17 @@ public class AuthPresenterImp implements AuthContract.Presenter, FirebaseAuth.Au
 
 	@Override
 	public void start() {
-		ＴoolbarUIHelper.getInstance().setProgressBarVisibility(View.VISIBLE);
-		ＴoolbarUIHelper.getInstance().setTextViewVisibility(View.VISIBLE);
-		ＴoolbarUIHelper.getInstance().setText(R.string.logining);
+		ToolbarUIHelper.getInstance().setProgressBarVisibility(View.VISIBLE);
+		ToolbarUIHelper.getInstance().setTextViewVisibility(View.VISIBLE);
+		ToolbarUIHelper.getInstance().setText(R.string.logining);
 		FirebaseAuth.getInstance().addAuthStateListener(this);
 		if (FirebaseAuth.getInstance().getCurrentUser() == null) {
 			if (authView != null) {
 				authView.onAuthSignOut();
 			}
-			ＴoolbarUIHelper.getInstance().setProgressBarVisibility(View.GONE);
-			ＴoolbarUIHelper.getInstance().setTextViewVisibility(View.GONE);
-			ＴoolbarUIHelper.getInstance().setText("");
+			ToolbarUIHelper.getInstance().setProgressBarVisibility(View.GONE);
+			ToolbarUIHelper.getInstance().setTextViewVisibility(View.GONE);
+			ToolbarUIHelper.getInstance().setText("");
 		}
 		FireBaseManager.getInstance().login(new OnCompleteListener() {
 			@Override
@@ -41,9 +41,9 @@ public class AuthPresenterImp implements AuthContract.Presenter, FirebaseAuth.Au
 				if (task.isSuccessful()) {
 					authView.onLogin();
 				}
-				ＴoolbarUIHelper.getInstance().setProgressBarVisibility(View.GONE);
-				ＴoolbarUIHelper.getInstance().setTextViewVisibility(View.GONE);
-				ＴoolbarUIHelper.getInstance().setText("");
+				ToolbarUIHelper.getInstance().setProgressBarVisibility(View.GONE);
+				ToolbarUIHelper.getInstance().setTextViewVisibility(View.GONE);
+				ToolbarUIHelper.getInstance().setText("");
 			}
 		});
 
@@ -66,9 +66,9 @@ public class AuthPresenterImp implements AuthContract.Presenter, FirebaseAuth.Au
 			if (authView != null) {
 				authView.onAuthSignOut();
 			}
-			ＴoolbarUIHelper.getInstance().setProgressBarVisibility(View.GONE);
-			ＴoolbarUIHelper.getInstance().setTextViewVisibility(View.GONE);
-			ＴoolbarUIHelper.getInstance().setText("");
+			ToolbarUIHelper.getInstance().setProgressBarVisibility(View.GONE);
+			ToolbarUIHelper.getInstance().setTextViewVisibility(View.GONE);
+			ToolbarUIHelper.getInstance().setText("");
 		}
 	}
 

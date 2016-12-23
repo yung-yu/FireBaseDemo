@@ -187,10 +187,8 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 								FirebaseAuthException exception = (FirebaseAuthException) task.getException();
 								loginView.LoginFailed(exception.getMessage());
 							}
-
 						}
 						loginView.setProgessBarShow(false);
-
 					}
 				});
 	}

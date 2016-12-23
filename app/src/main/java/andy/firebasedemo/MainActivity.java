@@ -9,11 +9,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,6 +27,7 @@ import andy.firebasedemo.Log.L;
 import andy.firebasedemo.auth.AuthContract;
 import andy.firebasedemo.auth.AuthPresenterImp;
 import andy.firebasedemo.chatroom.ChatRoomFragment;
+import andy.firebasedemo.helper.ToolbarUIHelper;
 import andy.firebasedemo.login.LoginDialogFragment;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.manager.MemberManager;
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements AuthContract.View
 		setContentView(R.layout.activity_main);
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
-		ＴoolbarUIHelper.getInstance().init((ProgressBar) findViewById(R.id.toolbar_progress_bar),
+		ToolbarUIHelper.getInstance().init((ProgressBar) findViewById(R.id.toolbar_progress_bar),
 				(TextView) findViewById(R.id.toolbar_text));
 		setSupportActionBar(mToolbar);
 		mAuthPresenterImp = new AuthPresenterImp() ;

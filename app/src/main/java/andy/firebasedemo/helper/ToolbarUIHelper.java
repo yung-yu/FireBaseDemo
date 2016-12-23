@@ -1,4 +1,4 @@
-package andy.firebasedemo;
+package andy.firebasedemo.helper;
 
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -7,12 +7,12 @@ import android.widget.TextView;
  * Created by andyli on 2016/12/19.
  */
 
-public class ＴoolbarUIHelper {
-	static ＴoolbarUIHelper instance;
+public class ToolbarUIHelper {
+	static ToolbarUIHelper instance;
 
-	public static ＴoolbarUIHelper getInstance() {
+	public static ToolbarUIHelper getInstance() {
 		if (instance == null) {
-			instance = new ＴoolbarUIHelper();
+			instance = new ToolbarUIHelper();
 		}
 		return instance;
 	}
