@@ -159,16 +159,16 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 					vh.rightHeader.setTag(member.icon);
 					vh.leftHeader.setTag(null);
 
-					if (!TextUtils.isEmpty(member.icon)) {
-						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
-						if (bitmap != null && !bitmap.isRecycled()) {
-							vh.rightHeader.setImageBitmap(bitmap);
-						} else {
-							imageLoader.displayImage(member.icon, vh.rightHeader, getDisplayImageOptions());
-						}
-					} else {
-						vh.rightHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
-					}
+//					if (!TextUtils.isEmpty(member.icon)) {
+//						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
+//						if (bitmap != null && !bitmap.isRecycled()) {
+//							vh.rightHeader.setImageBitmap(bitmap);
+//						} else {
+//							imageLoader.displayImage(member.icon, vh.rightHeader, getDisplayImageOptions());
+//						}
+//					} else {
+//						vh.rightHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
+//					}
 
 				} else {
 					vh.leftTextContent.setVisibility(View.VISIBLE);
@@ -193,16 +193,16 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 							imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
 						}
 					}
-					if (!TextUtils.isEmpty(member.icon)) {
-						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
-						if (bitmap != null && !bitmap.isRecycled()) {
-							vh.leftHeader.setImageBitmap(bitmap);
-						} else {
-							imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
-						}
-					} else {
-						vh.leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
-					}
+//					if (!TextUtils.isEmpty(member.icon)) {
+//						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
+//						if (bitmap != null && !bitmap.isRecycled()) {
+//							vh.leftHeader.setImageBitmap(bitmap);
+//						} else {
+//							imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
+//						}
+//					} else {
+//						vh.leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
+//					}
 				}
 			} else {
 				vh.leftTextContent.setVisibility(View.VISIBLE);
@@ -219,15 +219,15 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 					vh.leftText.setVisibility(View.GONE);
 					vh.leftPhoto.setVisibility(View.VISIBLE);
 					vh.leftPhoto.setTag(message.downloadUrl);
-					Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
-					vh.rightPhoto.setTag(null);
-					if (bitmap != null && !bitmap.isRecycled()) {
-						vh.leftPhoto.setImageBitmap(bitmap);
-					} else {
-						vh.leftPhoto.setImageBitmap(null);
-						vh.leftPhoto.setTag(message.downloadUrl);
-						imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
-					}
+//					Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
+//					vh.rightPhoto.setTag(null);
+//					if (bitmap != null && !bitmap.isRecycled()) {
+//						vh.leftPhoto.setImageBitmap(bitmap);
+//					} else {
+//						vh.leftPhoto.setImageBitmap(null);
+//						vh.leftPhoto.setTag(message.downloadUrl);
+//						imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
+//					}
 				}
 			}
 
@@ -263,7 +263,10 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 
 			@Override
 			public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-
+				ImageView imageView = (ImageView) view;
+				if(imageUri.equals(imageView.getTag())){
+					imageView.setImageResource(R.drawable.visitor);
+				}
 			}
 
 			@Override

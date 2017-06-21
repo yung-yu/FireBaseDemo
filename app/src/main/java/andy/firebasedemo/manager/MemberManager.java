@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import andy.firebasedemo.main.SystemＣonstants;
+import andy.firebasedemo.main.SystemConstants;
 import andy.firebasedemo.object.Member;
 
 /**
@@ -35,11 +35,11 @@ public class MemberManager implements ChildEventListener {
 
 	public void registerUserListener(OnMemberChangeListener OnMemberChangeListener) {
 		this.listener = OnMemberChangeListener;
-		FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS).addChildEventListener(this);
+		FirebaseDatabase.getInstance().getReference(SystemConstants.TABLE_USERS).addChildEventListener(this);
 	}
 
 	public void unRegisterUserListener() {
-		FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS).removeEventListener(this);
+		FirebaseDatabase.getInstance().getReference(SystemConstants.TABLE_USERS).removeEventListener(this);
 		this.listener = null;
 	}
 

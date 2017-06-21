@@ -3,10 +3,8 @@ package andy.firebasedemo.chatroom;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.storage.StorageManager;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,7 +27,7 @@ import java.util.List;
 
 import andy.firebasedemo.Log.L;
 import andy.firebasedemo.R;
-import andy.firebasedemo.main.SystemＣonstants;
+import andy.firebasedemo.main.SystemConstants;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.manager.MemberManager;
 import andy.firebasedemo.object.Message;
@@ -140,7 +138,7 @@ public class ChatRoomPresenterImp implements ChatRoomContract.Presenter, MemberM
 	public void start() {
 		if(FirebaseAuth.getInstance().getCurrentUser() != null){
 			data = new ArrayList<>();
-			messageDatabase = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
+			messageDatabase = FirebaseDatabase.getInstance().getReference(SystemConstants.TABLE_MESSAGES);
 			messageDatabase.limitToLast(100).addValueEventListener(messageListener);
 			MemberManager.getInstance().registerUserListener(ChatRoomPresenterImp.this);
 		}

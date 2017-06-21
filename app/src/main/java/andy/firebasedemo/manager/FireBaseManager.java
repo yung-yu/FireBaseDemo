@@ -20,15 +20,13 @@ import com.squareup.okhttp.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import andy.firebasedemo.main.SystemＣonstants;
+import andy.firebasedemo.main.SystemConstants;
 import andy.firebasedemo.object.LoginFailedTask;
 import andy.firebasedemo.object.Member;
 import andy.firebasedemo.object.Message;
-import andy.firebasedemo.object.MessageType;
 
 /**
  * Created by andyli on 2016/10/19.
@@ -58,8 +56,8 @@ public class FireBaseManager {
 	public FireBaseManager() {
 		mAuth = FirebaseAuth.getInstance();
 		FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-		mMemberReference = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_USERS);
-		mMessagesReference = FirebaseDatabase.getInstance().getReference(SystemＣonstants.TABLE_MESSAGES);
+		mMemberReference = FirebaseDatabase.getInstance().getReference(SystemConstants.TABLE_USERS);
+		mMessagesReference = FirebaseDatabase.getInstance().getReference(SystemConstants.TABLE_MESSAGES);
 	}
 
 	public void login(OnCompleteListener listener) {
