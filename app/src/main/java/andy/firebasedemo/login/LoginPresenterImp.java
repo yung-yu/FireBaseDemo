@@ -95,10 +95,14 @@ public class LoginPresenterImp implements LoginContract.Presenter {
 		loginView.setProgessBarShow(true);
 		if (mCallbackManager == null) mCallbackManager = CallbackManager.Factory.create();
 		LoginManager.getInstance().registerCallback(mCallbackManager, mFacebookCallback);
-		if (mFragment != null) {
-			LoginManager.getInstance().logInWithReadPermissions(mFragment, Arrays.asList(FACEBOOK_PERMISSIONS));
-		} else if (mActivity != null) {
-			LoginManager.getInstance().logInWithReadPermissions(mActivity, Arrays.asList(FACEBOOK_PERMISSIONS));
+		if(AccessToken.getCurrentAccessToken() != null){
+            handleFacebookAccessToken(AccessToken.getCurrentAccessToken());
+		} else {
+			if (mFragment != null) {
+				LoginManager.getInstance().logInWithReadPermissions(mFragment, Arrays.asList(FACEBOOK_PERMISSIONS));
+			} else if (mActivity != null) {
+				LoginManager.getInstance().logInWithReadPermissions(mActivity, Arrays.asList(FACEBOOK_PERMISSIONS));
+			}
 		}
 	}
 
