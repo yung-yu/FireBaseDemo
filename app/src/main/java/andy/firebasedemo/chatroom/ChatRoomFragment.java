@@ -99,8 +99,8 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 		super.onViewCreated(view, savedInstanceState);
 		mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
 
-//		ToolbarUIHelper.getInstance().init((ProgressBar) view.findViewById(R.id.toolbar_progress_bar),
-//				(TextView) view.findViewById(R.id.toolbar_text));
+		ToolbarUIHelper.getInstance().init((ProgressBar) view.findViewById(R.id.toolbar_progress_bar),
+				(TextView) view.findViewById(R.id.toolbar_text));
 		setHasOptionsMenu(true);
 		((AppCompatActivity)getActivity()).setSupportActionBar(mToolbar);
 		editText = (EditText) view.findViewById(R.id.editText);
@@ -127,7 +127,6 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 		mMsgAdapter = new ChatRoomMessageAdapter(context);
 		listView.setLayoutManager(new LinearLayoutManager(context));
 		listView.setAdapter(mMsgAdapter);
-		listView.setNestedScrollingEnabled(true);
 		mMsgAdapter.setOnItemEventListener(new ChatRoomMessageAdapter.OnItemEventListener() {
 			@Override
 			public void onItemClick(View view, Message message) {

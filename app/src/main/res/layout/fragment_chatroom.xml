@@ -65,6 +65,7 @@
                 android:id="@+id/historyList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 />
        </android.support.v4.widget.NestedScrollView>
     </android.support.constraint.ConstraintLayout>
@@ -117,18 +118,10 @@
 
     <ImageView
         android:id="@+id/expanded_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:scaleType="fitCenter"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1"
         />
 
 
