@@ -15,6 +15,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +29,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,8 +39,13 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.List;
 
 import andy.firebasedemo.Log.L;
+import andy.firebasedemo.MainActivity;
 import andy.firebasedemo.R;
 import andy.firebasedemo.adapter.ChatRoomMessageAdapter;
+import andy.firebasedemo.auth.AuthContract;
+import andy.firebasedemo.auth.AuthPresenterImp;
+import andy.firebasedemo.helper.ToolbarUIHelper;
+import andy.firebasedemo.login.LoginDialogFragment;
 import andy.firebasedemo.manager.FireBaseManager;
 import andy.firebasedemo.object.Message;
 import andy.firebasedemo.object.MessageType;
@@ -42,25 +54,30 @@ import andy.firebasedemo.object.MessageType;
  * Created by andyli on 2016/11/25.
  */
 
-public class ChatRoomFragment extends Fragment implements ChatRoomContract.View {
+public class ChatRoomFragment extends Fragment implements ChatRoomContract.View , AuthContract.View{
 	private final static String TAG = "ChatRoomFragment";
 	private final static int GET_PHOTO_REQUEST_CODE = 8888;
 	private EditText editText;
 	private Button button;
 	private Button sendImage;
-	private ListView listView;
+	private RecyclerView listView;
 	private ChatRoomPresenterImp mMessagePresenterImp;
 	private ChatRoomMessageAdapter mMsgAdapter;
 	private Context context;
 	private AnimatorSet mCurrentAnimator;
 	private ImageView expandedImageView;
+	private Toolbar mToolbar;
 
+
+	private AuthPresenterImp mAuthPresenterImp;
 
 	@Override
 	public void onAttach(Context context) {
 		L.i(TAG, "ChatRoomFragment");
 		super.onAttach(context);
 		this.context = context;
+		mAuthPresenterImp = new AuthPresenterImp() ;
+		mAuthPresenterImp.setAuthView(this);
 	}
 
 	@Override
@@ -80,10 +97,16 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		L.i(TAG, "onViewCreated");
 		super.onViewCreated(view, savedInstanceState);
+		mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
+
+//		ToolbarUIHelper.getInstance().init((ProgressBar) view.findViewById(R.id.toolbar_progress_bar),
+//				(TextView) view.findViewById(R.id.toolbar_text));
+		setHasOptionsMenu(true);
+		((AppCompatActivity)getActivity()).setSupportActionBar(mToolbar);
 		editText = (EditText) view.findViewById(R.id.editText);
 		button = (Button) view.findViewById(R.id.button);
 		sendImage = (Button) view.findViewById(R.id.sendImage);
-		listView = (ListView) view.findViewById(R.id.listview);
+		listView = (RecyclerView) view.findViewById(R.id.historyList);
 
 		expandedImageView = (ImageView) view.findViewById(R.id.expanded_image);
 		button.setOnClickListener(new View.OnClickListener() {
@@ -102,29 +125,28 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 			}
 		});
 		mMsgAdapter = new ChatRoomMessageAdapter(context);
+		listView.setLayoutManager(new LinearLayoutManager(context));
 		listView.setAdapter(mMsgAdapter);
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		listView.setNestedScrollingEnabled(true);
+		mMsgAdapter.setOnItemEventListener(new ChatRoomMessageAdapter.OnItemEventListener() {
 			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				final Message msg = mMsgAdapter.getItem(i);
+			public void onItemClick(View view, Message message) {
 				FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-				if(msg.type != null && msg.type.equals(MessageType.Photo.name())){
-					if(user != null && msg.fromId.equals(user.getUid())){
+				if(message.type != null && message.type.equals(MessageType.Photo.name())){
+					if(user != null && message.fromId.equals(user.getUid())){
 						ImageView imageView = (ImageView) view.findViewById(R.id.rightPhoto);
-						zoomImageFromThumb(imageView, expandedImageView, mMsgAdapter.getBitmap(msg.downloadUrl));
+						zoomImageFromThumb(imageView, expandedImageView, mMsgAdapter.getBitmap(message.downloadUrl));
 					}else{
 						ImageView imageView = (ImageView) view.findViewById(R.id.leftPhoto);
-						zoomImageFromThumb(imageView, expandedImageView, mMsgAdapter.getBitmap(msg.downloadUrl));
+						zoomImageFromThumb(imageView, expandedImageView, mMsgAdapter.getBitmap(message.downloadUrl));
 					}
 				}
 			}
-		});
-		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
 			@Override
-			public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-				final Message msg = mMsgAdapter.getItem(i);
+			public boolean onLongItemClick(View view, final Message message) {
 				FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-				if (user != null && msg.fromId.equals(user.getUid())) {
+				if (user != null && message.fromId.equals(user.getUid())) {
 					new AlertDialog.Builder(context)
 							.setMessage(R.string.app_name)
 							.setMessage(R.string.delete_tip)
@@ -132,7 +154,7 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 								@Override
 								public void onClick(DialogInterface dialogInterface, int i) {
 
-									FireBaseManager.getInstance().deleteMessage(msg.id);
+									FireBaseManager.getInstance().deleteMessage(message.id);
 									dialogInterface.cancel();
 								}
 							})
@@ -145,6 +167,16 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 		mMessagePresenterImp = new ChatRoomPresenterImp(context, this);
 	}
 
+    private void initToolBar(Toolbar mToolbar){
+		mToolbar.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+			@Override
+			public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+
+			}
+		});
+
+	}
+
 
 	@Override
 	public void onStart() {
@@ -153,6 +185,7 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 		if (mMessagePresenterImp != null) {
 			mMessagePresenterImp.start();
 		}
+		mAuthPresenterImp.start();
 	}
 
 	@Override
@@ -172,6 +205,7 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 		L.i(TAG, "onStop");
 		super.onStop();
 		mMessagePresenterImp.stop();
+		mAuthPresenterImp.stop();
 	}
 
 	@Override
@@ -193,8 +227,8 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 			Uri uri = data.getData();
 			mMessagePresenterImp.sendImage(uri);
 		}
-	}
 
+	}
 	@Override
 	public void sendMessageReady() {
 		button.setEnabled(false);
@@ -220,7 +254,7 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 			mMsgAdapter.notifyDataSetChanged();
 		}
 		if (listView != null) {
-			listView.setSelection(data.size());
+			listView.scrollToPosition(data.size());
 		}
 	}
 
@@ -354,4 +388,17 @@ public class ChatRoomFragment extends Fragment implements ChatRoomContract.View 
 			}
 		});
 	}
+
+	@Override
+	public void onAuthSignOut() {
+		((MainActivity)getActivity()).showLoginDialog();
+
+	}
+
+	@Override
+	public void onLogin() {
+
+	}
+
+
 }

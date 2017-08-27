@@ -4,41 +4,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        android:layout_alignParentTop="true"
-        android:background="@color/colorPrimary"
-        app:popupTheme="@style/Theme.AppCompat"
-        app:theme="@style/toolbarTheme"
-        app:title="@string/app_name"
-        app:titleTextColor="#fff"
-        >
-
-        <ProgressBar
-            android:id="@+id/toolbar_progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:indeterminateTint="#FFF"
-            android:indeterminateTintMode="src_in"
-            android:visibility="gone"
-            />
-        <TextView
-            android:id="@+id/toolbar_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:textColor="#FFF"
-            android:visibility="gone"
-            />
-    </android.support.v7.widget.Toolbar>
-
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"

@@ -1,18 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:id="@+id/container"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent">
 
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/bottomToolbar">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:layout_editor_absoluteY="25dp">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:layout_scrollFlags="scroll|enterAlways"
+                >
+
+                <ProgressBar
+                    android:id="@+id/toolbar_progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:indeterminateTint="#FFF"
+                    android:indeterminateTintMode="src_in"
+                    android:visibility="gone"
+                    />
+
+                <TextView
+                    android:id="@+id/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:textColor="#FFF"
+                    android:visibility="gone"
+                    />
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+       <android.support.v4.widget.NestedScrollView
+           android:layout_width="368dp"
+           android:layout_height="470dp"
+           app:layout_behavior="@string/appbar_scrolling_view_behavior"
+           app:layout_constraintLeft_toLeftOf="parent"
+           app:layout_constraintRight_toRightOf="parent"
+           app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/historyList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+       </android.support.v4.widget.NestedScrollView>
+    </android.support.constraint.ConstraintLayout>
 
     <RelativeLayout
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:background="@color/colorPrimary">
 
         <Button
@@ -30,48 +91,48 @@
             android:id="@+id/editText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:padding="5dp"
+            android:layout_toEndOf="@+id/sendImage"
+            android:layout_toRightOf="@+id/sendImage"
             android:background="@null"
             android:ems="10"
             android:hint="@string/please_input_message"
             android:inputType="textPersonName"
+            android:padding="5dp"
             android:textColor="#fff"
-            android:textColorHint="#fff"
-            android:layout_toLeftOf="@+id/button"
-            android:layout_alignBottom="@+id/button"
-            android:layout_toRightOf="@+id/sendImage"
-            android:layout_toEndOf="@+id/sendImage"/>
+            android:textColorHint="#fff"/>
 
         <Button
-            android:text="+"
+            android:id="@+id/sendImage"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:background="@null"
-            android:textColor="#fff"
-            android:id="@+id/sendImage"/>
+            android:text="+"
+            android:textColor="#fff"/>
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/listview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottomToolbar"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_margin="5dp"
-        android:layout_below="@+id/toolbar"
-        android:stackFromBottom="true"
-        android:divider="@null"
-        android:dividerHeight="5dp"/>
     <ImageView
         android:id="@+id/expanded_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:scaleType="fitCenter"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"
         />
+
+
+
+
 
 </RelativeLayout>

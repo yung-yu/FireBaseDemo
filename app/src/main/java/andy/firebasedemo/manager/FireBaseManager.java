@@ -55,7 +55,7 @@ public class FireBaseManager {
 
 	public FireBaseManager() {
 		mAuth = FirebaseAuth.getInstance();
-		FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
 		mMemberReference = FirebaseDatabase.getInstance().getReference(SystemConstants.TABLE_USERS);
 		mMessagesReference = FirebaseDatabase.getInstance().getReference(SystemConstants.TABLE_MESSAGES);
 	}

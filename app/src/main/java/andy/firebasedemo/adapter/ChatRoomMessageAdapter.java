@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.MediaStore;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.LruCache;
 import android.view.Gravity;
@@ -56,11 +57,181 @@ import andy.firebasedemo.util.TimeUtils;
  * Created by andyli on 2016/11/7.
  */
 
-public class ChatRoomMessageAdapter extends BaseAdapter {
+public class ChatRoomMessageAdapter extends RecyclerView.Adapter<ChatRoomMessageAdapter.ViewHolder> {
 	private final static String TAG = "ChatRoomMessageAdapter";
 	private Context context;
 	private List<Message> data = new ArrayList<>();
 	private ImageLoader imageLoader;
+
+	private  OnItemEventListener onItemEventListener;
+
+
+	public void setOnItemEventListener(OnItemEventListener oOnItemEventListener) {
+		this.onItemEventListener = oOnItemEventListener;
+	}
+
+	public interface OnItemEventListener{
+		void onItemClick(View view, Message message);
+		boolean onLongItemClick(View view, Message message);
+	}
+
+
+	public class ViewHolder extends RecyclerView.ViewHolder{
+		ImageView leftHeader;
+		ImageView rightHeader;
+		LinearLayout leftTextContent;
+		LinearLayout rightTextContent;
+		TextView leftText;
+		TextView rightText;
+		TextView leftTime;
+		TextView rightTime;
+		ImageView leftPhoto;
+		ImageView rightPhoto;
+		private Message msg;
+
+		public ViewHolder(View view) {
+			super(view);
+			leftHeader = (ImageView) view.findViewById(R.id.left_header);
+			rightHeader =  (ImageView) view.findViewById(R.id.right_header);
+			leftText = (TextView) view.findViewById(R.id.leftText);
+			leftTextContent = (LinearLayout) view.findViewById(R.id.leftTextContent);
+			rightText = (TextView) view.findViewById(R.id.rightText);
+			rightTextContent = (LinearLayout) view.findViewById(R.id.rightTextContent);
+			leftTime = (TextView) view.findViewById(R.id.leftTime);
+			rightTime = (TextView) view.findViewById(R.id.rightTime);
+			leftPhoto = (ImageView) view.findViewById(R.id.leftPhoto);
+			rightPhoto = (ImageView) view.findViewById(R.id.rightPhoto);
+            itemView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					if(onItemEventListener != null){
+						onItemEventListener.onItemClick(view, msg);
+					}
+
+				}
+			});
+			itemView.setOnLongClickListener(new View.OnLongClickListener() {
+				@Override
+				public boolean onLongClick(View view) {
+					if(onItemEventListener != null){
+						return  onItemEventListener.onLongItemClick(view, msg);
+					}
+					return false;
+				}
+			});
+		}
+
+		public void update(Message message){
+			msg = message;
+			if(message != null) {
+				MessageType msgType = MessageType.text;
+				if(!TextUtils.isEmpty(message.type)) {
+					msgType = MessageType.valueOf(message.type);
+				}
+				Member member = MemberManager.getInstance().getMemberById(message.fromId);
+				if (member != null) {
+					if (isMe(message.fromId)) {
+						leftTextContent.setVisibility(View.GONE);
+						rightTextContent.setVisibility(View.VISIBLE);
+						rightTime.setText(TimeUtils.getTimeFormatStr(message.time));
+
+						if(msgType == null || msgType.equals(MessageType.text)){
+							rightText.setVisibility(View.VISIBLE);
+							rightPhoto.setVisibility(View.GONE);
+							rightText.setText(member.name + "說:\n" + message.text);
+						} else if (msgType.equals(MessageType.Photo)){
+							rightText.setVisibility(View.GONE);
+							rightPhoto.setVisibility(View.VISIBLE);
+							rightPhoto.setTag(message.downloadUrl);
+							Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
+							leftPhoto.setTag(null);
+							if (bitmap != null && !bitmap.isRecycled()) {
+								rightPhoto.setImageBitmap(bitmap);
+							} else {
+								rightPhoto.setImageBitmap(null);
+								rightPhoto.setTag(message.downloadUrl);
+								imageLoader.displayImage(message.downloadUrl, rightPhoto, getDisplayImageOptions());
+							}
+						}
+
+						rightHeader.setTag(member.icon);
+						leftHeader.setTag(null);
+
+//					if (!TextUtils.isEmpty(member.icon)) {
+//						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
+//						if (bitmap != null && !bitmap.isRecycled()) {
+//							rightHeader.setImageBitmap(bitmap);
+//						} else {
+//							imageLoader.displayImage(member.icon, rightHeader, getDisplayImageOptions());
+//						}
+//					} else {
+//						rightHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
+//					}
+
+					} else {
+						leftTextContent.setVisibility(View.VISIBLE);
+						rightTextContent.setVisibility(View.GONE);
+						leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
+						leftHeader.setTag(member.icon);
+						if(msgType == null || msgType.equals(MessageType.text)){
+							leftText.setVisibility(View.VISIBLE);
+							leftPhoto.setVisibility(View.GONE);
+							leftText.setText(member.name + "說:\n" + message.text);
+						} else if (msgType.equals(MessageType.Photo)){
+							leftText.setVisibility(View.GONE);
+							leftPhoto.setVisibility(View.VISIBLE);
+							leftPhoto.setTag(message.downloadUrl);
+							Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
+							rightPhoto.setTag(null);
+							if (bitmap != null && !bitmap.isRecycled()) {
+								leftPhoto.setImageBitmap(bitmap);
+							} else {
+								leftPhoto.setImageBitmap(null);
+								leftPhoto.setTag(message.downloadUrl);
+								imageLoader.displayImage(message.downloadUrl, leftPhoto, getDisplayImageOptions());
+							}
+						}
+//					if (!TextUtils.isEmpty(member.icon)) {
+//						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
+//						if (bitmap != null && !bitmap.isRecycled()) {
+//							leftHeader.setImageBitmap(bitmap);
+//						} else {
+//							imageLoader.displayImage(member.icon, leftHeader, getDisplayImageOptions());
+//						}
+//					} else {
+//						leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
+//					}
+					}
+				} else {
+					leftTextContent.setVisibility(View.VISIBLE);
+					rightTextContent.setVisibility(View.GONE);
+					rightHeader.setTag(null);
+					leftHeader.setTag(null);
+					leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
+					leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
+					if(msgType == null || msgType.equals(MessageType.text)){
+						leftText.setVisibility(View.VISIBLE);
+						leftPhoto.setVisibility(View.GONE);
+						leftText.setText("某人說:\n" + message.text);
+					} else if (msgType.equals(MessageType.Photo)){
+						leftText.setVisibility(View.GONE);
+						leftPhoto.setVisibility(View.VISIBLE);
+						leftPhoto.setTag(message.downloadUrl);
+//					Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
+//					rightPhoto.setTag(null);
+//					if (bitmap != null && !bitmap.isRecycled()) {
+//						leftPhoto.setImageBitmap(bitmap);
+//					} else {
+//						leftPhoto.setImageBitmap(null);
+//						leftPhoto.setTag(message.downloadUrl);
+//						imageLoader.displayImage(message.downloadUrl, leftPhoto, getDisplayImageOptions());
+//					}
+					}
+				}
+
+			}
+		}
+	}
 
 	public void setData(List<Message> data) {
 		this.data.clear();
@@ -74,166 +245,36 @@ public class ChatRoomMessageAdapter extends BaseAdapter {
 
 	}
 
-	@Override
-	public int getCount() {
-		return data.size();
+
+	public Message getItem(int i) {
+		return i < data.size() ? data.get(i):null;
 	}
 
 	@Override
-	public Message getItem(int i) {
-		return i < data.size() ? data.get(i):null;
+	public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.adapter_message_item, null));
+	}
+
+	@Override
+	public void onBindViewHolder(ViewHolder holder, int position) {
+		holder.update(getItem(position));
 	}
 
 	@Override
 	public long getItemId(int i) {
 		return 0;
 	}
-    class ViewHolder{
-		ImageView leftHeader;
-		ImageView rightHeader;
-		LinearLayout leftTextContent;
-		LinearLayout rightTextContent;
-		TextView leftText;
-		TextView rightText;
-		TextView leftTime;
-		TextView rightTime;
-		ImageView leftPhoto;
-		ImageView rightPhoto;
+
+	@Override
+	public int getItemCount() {
+		return data.size();
 	}
+
 	private boolean isMe(String uid){
 		return  FirebaseAuth.getInstance().getCurrentUser() != null
 				&& uid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid());
 	}
-	@Override
-	public View getView(final int i, View view, ViewGroup viewGroup) {
-		ViewHolder vh;
-		if(view == null){
-			vh = new ViewHolder();
-			view = LayoutInflater.from(context).inflate(R.layout.adapter_message_item, null);
-			vh.leftHeader = (ImageView) view.findViewById(R.id.left_header);
-			vh.rightHeader =  (ImageView) view.findViewById(R.id.right_header);
-			vh.leftText = (TextView) view.findViewById(R.id.leftText);
-			vh.leftTextContent = (LinearLayout) view.findViewById(R.id.leftTextContent);
-			vh.rightText = (TextView) view.findViewById(R.id.rightText);
-			vh.rightTextContent = (LinearLayout) view.findViewById(R.id.rightTextContent);
-			vh.leftTime = (TextView) view.findViewById(R.id.leftTime);
-			vh.rightTime = (TextView) view.findViewById(R.id.rightTime);
-			vh.leftPhoto = (ImageView) view.findViewById(R.id.leftPhoto);
-			vh.rightPhoto = (ImageView) view.findViewById(R.id.rightPhoto);
-			view.setTag(vh);
-		}else{
-			vh = (ViewHolder) view.getTag();
-		}
-		Message message = getItem(i);
-		if(message != null) {
-			MessageType msgType = MessageType.text;
-			if(!TextUtils.isEmpty(message.type)) {
-				msgType = MessageType.valueOf(message.type);
-			}
-			Member member = MemberManager.getInstance().getMemberById(message.fromId);
-			if (member != null) {
-				if (isMe(message.fromId)) {
-					vh.leftTextContent.setVisibility(View.GONE);
-					vh.rightTextContent.setVisibility(View.VISIBLE);
-					vh.rightTime.setText(TimeUtils.getTimeFormatStr(message.time));
 
-					if(msgType == null || msgType.equals(MessageType.text)){
-						vh.rightText.setVisibility(View.VISIBLE);
-						vh.rightPhoto.setVisibility(View.GONE);
-						vh.rightText.setText(member.name + "說:\n" + message.text);
-					} else if (msgType.equals(MessageType.Photo)){
-						vh.rightText.setVisibility(View.GONE);
-						vh.rightPhoto.setVisibility(View.VISIBLE);
-						vh.rightPhoto.setTag(message.downloadUrl);
-						Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
-						vh.leftPhoto.setTag(null);
-						if (bitmap != null && !bitmap.isRecycled()) {
-							vh.rightPhoto.setImageBitmap(bitmap);
-						} else {
-							vh.rightPhoto.setImageBitmap(null);
-							vh.rightPhoto.setTag(message.downloadUrl);
-							imageLoader.displayImage(message.downloadUrl, vh.rightPhoto, getDisplayImageOptions());
-						}
-					}
-
-					vh.rightHeader.setTag(member.icon);
-					vh.leftHeader.setTag(null);
-
-//					if (!TextUtils.isEmpty(member.icon)) {
-//						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
-//						if (bitmap != null && !bitmap.isRecycled()) {
-//							vh.rightHeader.setImageBitmap(bitmap);
-//						} else {
-//							imageLoader.displayImage(member.icon, vh.rightHeader, getDisplayImageOptions());
-//						}
-//					} else {
-//						vh.rightHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
-//					}
-
-				} else {
-					vh.leftTextContent.setVisibility(View.VISIBLE);
-					vh.rightTextContent.setVisibility(View.GONE);
-					vh.leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
-					vh.leftHeader.setTag(member.icon);
-					if(msgType == null || msgType.equals(MessageType.text)){
-						vh.leftText.setVisibility(View.VISIBLE);
-						vh.leftPhoto.setVisibility(View.GONE);
-						vh.leftText.setText(member.name + "說:\n" + message.text);
-					} else if (msgType.equals(MessageType.Photo)){
-						vh.leftText.setVisibility(View.GONE);
-						vh.leftPhoto.setVisibility(View.VISIBLE);
-						vh.leftPhoto.setTag(message.downloadUrl);
-						Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
-						vh.rightPhoto.setTag(null);
-						if (bitmap != null && !bitmap.isRecycled()) {
-							vh.leftPhoto.setImageBitmap(bitmap);
-						} else {
-							vh.leftPhoto.setImageBitmap(null);
-							vh.leftPhoto.setTag(message.downloadUrl);
-							imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
-						}
-					}
-//					if (!TextUtils.isEmpty(member.icon)) {
-//						Bitmap bitmap = imageLoader.getMemoryCache().get(member.icon);
-//						if (bitmap != null && !bitmap.isRecycled()) {
-//							vh.leftHeader.setImageBitmap(bitmap);
-//						} else {
-//							imageLoader.displayImage(member.icon, vh.leftHeader, getDisplayImageOptions());
-//						}
-//					} else {
-//						vh.leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
-//					}
-				}
-			} else {
-				vh.leftTextContent.setVisibility(View.VISIBLE);
-				vh.rightTextContent.setVisibility(View.GONE);
-				vh.rightHeader.setTag(null);
-				vh.leftHeader.setTag(null);
-				vh.leftTime.setText(TimeUtils.getTimeFormatStr(message.time));
-				vh.leftHeader.setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
-				if(msgType == null || msgType.equals(MessageType.text)){
-					vh.leftText.setVisibility(View.VISIBLE);
-					vh.leftPhoto.setVisibility(View.GONE);
-					vh.leftText.setText("某人說:\n" + message.text);
-				} else if (msgType.equals(MessageType.Photo)){
-					vh.leftText.setVisibility(View.GONE);
-					vh.leftPhoto.setVisibility(View.VISIBLE);
-					vh.leftPhoto.setTag(message.downloadUrl);
-//					Bitmap bitmap = imageLoader.getMemoryCache().get(message.downloadUrl);
-//					vh.rightPhoto.setTag(null);
-//					if (bitmap != null && !bitmap.isRecycled()) {
-//						vh.leftPhoto.setImageBitmap(bitmap);
-//					} else {
-//						vh.leftPhoto.setImageBitmap(null);
-//						vh.leftPhoto.setTag(message.downloadUrl);
-//						imageLoader.displayImage(message.downloadUrl, vh.leftPhoto, getDisplayImageOptions());
-//					}
-				}
-			}
-
-		}
-		return view;
-	}
 
 	private void initImageLoader(){
 		File cacheDir = StorageUtils.getCacheDirectory(context);
