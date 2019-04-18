@@ -1,3 +1,3 @@
 # FireBaseDemo
 
-##  練習 FireBase使用MVP實作程式架構
+## 簡易聊天室練習
